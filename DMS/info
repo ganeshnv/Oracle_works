@@ -1,0 +1,198 @@
+Realm
+Tenency
+Region
+Compartment
+
+only 4/32 regions contains 3 ADs, remaining all are having only 1 Ads
+1, Frankfurt Germany
+2, London South
+3, US East Ashburn
+4, US West Pheonix
+
+dig-media-service-access
+Repository Digital Media ...infra-helm 
+ 
+dig-media-service-admin
+dmp-dev-oc1-infra-ops
+dmp-dev-oc1-infra-dev
+
+
+af-johannesburg-1 jnb-cp_cluster
+ap-chuncheon-1 yny-cp_cluster
+ap-hyderabad-1 hyd-cp_cluster
+ap-melbourne-1 mel-cp_cluster
+ap-mumbai-1 bom-cp_cluster
+ap-osaka-1 kix-cp_cluster
+ap-seoul-1 icn-cp_cluster
+ap-singapore-1 sin-cp_cluster
+ap-sydney-1 syd-cp_cluster
+ap-tokyo-1 nrt-cp_cluster
+ca-montreal-1 yul-cp_cluster
+ca-toronto-1 yyz-cp_cluster
+eu-amsterdam-1 ams-cp_cluster
+eu-frankfurt-1 fra-cp_cluster
+eu-marseille-1 mrs-cp_cluster
+eu-milan-1 lin-cp_cluster
+eu-paris-1 cdg-cp_cluster
+eu-stockholm-1 arn-cp_cluster
+eu-zurich-1 zrh-cp_cluster
+il-jerusalem-1 mtz-cp_cluster
+me-abudhabi-1 auh-cp_cluster
+me-dubai-1 dxb-cp_cluster
+me-jeddah-1 jed-cp_cluster
+sa-santiago-1 scl-cp_cluster
+sa-saopaulo-1 gru-cp_cluster
+sa-vinhedo-1 vcp-cp_cluster
+uk-cardiff-1 cwl-cp_cluster
+uk-london-1 lhr-cp_cluster
+us-ashburn-1 iad-cp_cluster
+us-phoenix-1 phx-cp_cluster
+us-sanjose-1 sjc-cp_cluster
+mx-queretaro-1 qro-cp_cluster
+dev1 dev-cluster1
+dev2 dev-cluster2
+dev3 dev-cluster3
+dev2-cp
+dev2-dp
+stg-cp
+stg-cp
+iad-prepord-cp
+iad-prepord-dp
+lhr-prepord-cp
+lhr-prepord-dp
+phx-prepord-cp
+phx-prepord-dp
+
+
+kubectl config use-context iad-dp_cluster
+kubectl delete pods --field-selector=status.phase=Failed
+curl http://127.0.0.1:10248/healthz
+sudo systemctl status kubelet
+journalctl -u kubelet
+sudo systemctl restart kubelet
+
+
+
+
+  name: dev-cluster1       
+  name: dev-cluster2
+  name: dev-cluster3
+  name: dev2-iad-controlplane_cluster
+  name: dev2-iad-dataplane_cluster
+  name: stg-controlplane_cluster
+  name: stg-dataplane_cluster
+  name: preprod-iad-cp_cluster
+  name: preprod-iad-dataplane_cluster
+  name: preprod-lhr-cp_cluster
+  name: preprod-lhr-dataplane_cluster
+  name: preprod-phx-cp_cluster
+  name: preprod-phx-dataplane_cluster
+  name: ams-cp_cluster
+  name: ams-dp_cluster
+  name: arn-cp_cluster
+  name: arn-dp_cluster
+  name: auh-cp_cluster
+  name: auh-dp_cluster
+  name: bom-cp_cluster
+  name: bom-dp_cluster
+  name: cdg-cp_cluster
+  name: cdg-dp_cluster
+  name: cwl-cp_cluster
+  name: cwl-dp_cluster
+  name: dxb-cp_cluster
+  name: dxb-dp_cluster
+  name: fra-cp_cluster
+  name: fra-dp_cluster
+  name: gru-cp_cluster
+  name: gru-dp_cluster
+  name: hyd-cp_cluster
+  name: hyd-dp_cluster
+  name: iad-cp_cluster
+  name: iad-dp_cluster
+  name: icn-cp_cluster
+  name: icn-dp_cluster
+  name: jed-cp_cluster
+  name: jed-dp_cluster
+  name: jnb-cp_cluster
+  name: jnb-dp_cluster
+  name: kix-cp_cluster
+  name: kix-dp_cluster
+  name: lhr-cp_cluster
+  name: lhr-dp_cluster
+  name: lin-cp_cluster
+  name: lin-dp_cluster
+  name: mel-cp_cluster
+  name: mel-dp_cluster
+  name: mrs-cp_cluster
+  name: mrs-dp_cluster
+  name: mtz-cp_cluster
+  name: mtz-dp_cluster
+  name: nrt-cp_cluster
+  name: nrt-dp_cluster
+  name: phx-cp_cluster
+  name: phx-dp_cluster
+  name: qro-cp_cluster
+  name: qro-dp_cluster
+  name: scl-cp_cluster
+  name: scl-dp_cluster
+  name: sin-cp_cluster
+  name: sin-dp_cluster
+  name: sjc-cp_cluster
+  name: sjc-dp_cluster
+  name: syd-cp_cluster
+  name: syd-dp_cluster
+  name: vcp-cp_cluster
+  name: vcp-dp_cluster
+  name: yny-cp_cluster
+  name: yny-dp_cluster
+  name: yul-cp_cluster
+  name: yul-dp_cluster
+  name: yyz-cp_cluster
+  name: yyz-dp_cluster
+  name: zrh-cp_cluster
+  name: zrh-dp_cluster
+  name: test_cluster
+  name: test_cluster2
+  
+
+Logs for Pod stuck in “ContainerCreating”
+
+    Check pod event logs:  logGrop = kube-event, #eventNamespace = <pod namespace>, #eventName = <pod name>
+    Check kubelet logs:  logGrop = kubelet, msg = <msg_from_event_log> or msg = Error
+    Check Node logs:  #_oke_node_ip = <node_ip>, msg = <pod_name>
+
+
+
+
+Why calico-node is in crashloopback state ?
+
+Failed to assign interface to one of the pods in the node and gets failed status, which leads to crashloopback.
+
+i.e chaos-testing/chaos-daemon-98d5q
+
+Why calico node not able to assign the interface to chaos-daemon ?
+
+chaos-testing/chaos-daemon-98d5q is in container creating state and stuck in this phase
+
+Why chaos-daemon is stuck ?
+
+stuck in this phase as port already in use
+
+Why this port was already-in use ?
+
+kube-proxy automatically assign to random port during startup and binds to that port 
+
+Restart the kube-proxy fixed all the cascading pods 
+
+
+
+Client Tenancy Setup for Dev and CPM Tenancies Completed. Both the Client Tenancies were Subscribed to all regions covered by the Dev/Staging/PreProd Regions.
+i.e us-ashburn-1, us-phoenix-1, uk-london-1, ap-hyderabad-1, us-sanjose-1
+CPM Tenancy meant for PM Testing
+Dev Tenancy meant for all Services Testing
+Dev Tenancy created with individual service compartments and negative compartments for multiple combos of testing.
+More Details are specified in the Client Tenancy Setup Wiki.
+https://confluence.oci.oraclecorp.com/display/DMP/OC1+Client+Child+Tenancy+Setup+Task+Items
+ocidmpclientdev - https://cloud.oracle.com/a/?tenant=bmc_operator_access&provider=ocna-saml&override_tenant=ocid1.tenancy.oc1..aaaaaaaabgjjlxrdzulx6osbcwbmmqupbmiuoewfuljun2th7twvk7mvxgjq
+ocidmpclientcpm - https://cloud.oracle.com/a/?tenant=bmc_operator_access&provider=ocna-saml&override_tenant=ocid1.tenancy.oc1..aaaaaaaa62wsptgw2wibwpppketyzdgq7nfy7eog2qbeufcgiv2m5fzltnzq
+

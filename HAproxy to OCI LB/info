@@ -1,0 +1,25 @@
+
+
+
+https://confluence.oraclecorp.com/confluence/pages/viewpage.action?spaceKey=OCCPS&title=OCI+LBR+to+Replace+Legacy+HAProxy+Hosts
+
+
+
+compute.brcom-central-1.oraclecloud.com:443  123 HA proxy  -- route control 1, 3nodes
+ocws
+rcws
+
+OCI LB  -- 4  con 1
+
+
+
+proxyhost:
+
+sp1clc2r203ru11.brdc1.oraclecloud.com   10.127.165.5
+sp1clc2r203ru12.brdc1.oraclecloud.com   10.127.165.6
+
+openssl s_client -showcerts -connect compute.brcom-central-1.oraclecloud.com:443 2>/dev/null|  openssl x509 -issuer -subject -dates -noout
+issuer= /C=US/O=DigiCert Inc/CN=DigiCert TLS RSA SHA256 2020 CA1
+subject= /C=US/ST=California/L=Redwood City/O=Oracle Corporation/CN=*.brcom-central-1.oraclecloud.com
+
+

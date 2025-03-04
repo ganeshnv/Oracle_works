@@ -1,0 +1,223 @@
+S2 Handover
+1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-29951, Zoom is ongoing
+2, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-29927, we have a customer zoom on 23 July 21, 8.30 PM IST, please join.  ref ticket, 29944
+3, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-29955, waiting for customer response, keep on eye.
+4, Follow up this mail, Re: SCHNEIDER ELECTRIC - SR 3-26511931364 | OCICIAAS-29588
+5, Follow up on dbshim restarts for brcom
+
+
+ 
+1, https://jira-sd.mc1.oracleiaas.com/projects/OCICIAAS/queues/custom/3443/OCICIAAS-30185, RCA, Sajeev request some info, need to follow up
+2, https://jira-sd.mc1.oracleiaas.com/projects/OCICIAAS/queues/custom/3443/OCICIAAS-30185, maintainance ticket 
+3, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-30133 ==> Replace migrated Subaru VMs to empty BM nodes ==> need help in investigating
+4, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-30188 --> service deletion failed at stop-compute-metering-resources ==> just now we have received need some one attention
+
+
+
+1, https://jira-sd.mc1.oracleiaas.com/projects/OCICIAAS/queues/custom/3443/OCICIAAS-30419, unable to start named_api service, someone needs to check
+2, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-30274   => named_api issue, some need to check
+3, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-30432, requested info, need to follow up
+4, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-30255   => Dead node  issue, someone to check it
+5, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-30252 => 3 inactive nodes , bnode is not starting up
+
+
+HO,
+1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-30729 -- looks user Account is Good, suggest further
+2, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-30728 ===>there were error in higgs audit, it's cleared but still report failing.
+
+
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-30980, someone needs to dig more
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-30983
+
+
+
+ https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-31154 =>smoke test failure
+
+
+
+
+1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-30647 == CC at 5PM, please someone create a zoom session and assist
+2, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-31127 == reverted the messed stuff, need to resolve an actual issue
+3, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-31284 ==> Customer cannot delete Instance in their OCI Classic tenancy ==> need further help
+
+
+
+Name:	kermit.usdc2.oraclecloud.com
+Address: 10.193.149.115
+
+
+1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-31385 -- close once linked network ticket updated the cause of the issue.
+
+
+1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-32093 -- seems like not ocic, requested instance details. please follow up.
+
+
+
+1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-32490 --  There is no oci node available in this region, seems instance still on old node, someone verify and confirm.
+2, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-32484 --  please address the customer queries
+
+
+
+S2 HO:
+1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-32691 -- maintenance postpond request, tagged todd & team. please follow up.
+2, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-326
+
+
+
+
+S2
+For Morning HO:
+ https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-32826, As per analysis output there is no issue with server end, need to check source vm and yum configuration. Just wait the source VMs info from customer and debugging further.
+
+S2 HO:
+Dead node tickets, updated the findings, please check it further
+ 1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33127
+ 2, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33128
+ 3, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33129
+ 4, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33152
+
+5, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33140, bcluster not found, updated findings, check it further.
+6, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33138, mixed error, someone please check.
+7, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33153, maintenance query, updated. assist if they comes back.
+
+
+
+1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33138, 10.102.246.213 server is down which is causing all the failures, someone please check and boot back the servert to resolve all this issues.
+
+
+
+S2 HO?
+
+1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33355, Cannot satisfy resource error, only 1 node has allowed instance tag, please assist further
+2, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33357, Cannot satisfy resource error, only 1 node has allowed instance tag, please assist further
+3, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33152, Dead node is BM node, there is no ipmi ip, @bprv / @cpusukur please check it further.
+4, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33138, Dead node, rebooted but no luck. updated on https://dyn.slack.com/archives/G010SCKQ17T/p1637037620417200 please follow up.
+5, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33369, requested instance details, please follow up
+
+
+
+
+
+S2 HO:
+
+1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33369, resolved development server issues, please assist if they come back for prod server issues.
+2, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33800, requested details, need to follow up
+3, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-33793, requested details, need to follow up
+
+
+
+S2 HO: 
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-34231, /mnt/bnode filesystem full, someone please check and make some space.
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-34211,
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-34210  
+In Above tickets, all looks good, but still reporting alert, wait for an hour if its doesn't back green please report this to Antony team.
+
+
+S2 HO:
+1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-34428, there is a call at 4 oc clock, cletus/Akshat please follow up.
+2, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-34628, requested info, please follow up
+3, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-34629, den14 filesystem full, please check
+
+
+S2 HO:
+1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-34963
+2, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-34964
+
+
+S2 HO:
+1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-36311, maintenance query, please assist once update the customer details.
+
+HO:
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-36985, Requesting RCA for instance reboot, someone please check
+
+
+
+HO:
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-37863, inactive node - unable to restart bnode service, someone please check.
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-37886, higgs-gateway-agent showing soem error, someone please check.
+
+HO:
+Hi ganesh
+
+
+
+
+
+HO:
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-40246 Service out of operation - waiting on customer update
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-40072 - Bala/Chaitanya looking into this.
+
+HO:
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-41364 - Restarted kernel panic instances, monitor and clean if next run come to green
+
+HO:
+VPNaas failure:
+1, gbcom-south-1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-41581 - Deleted vpnconnection for gbcom, please monitor for next run and check further.
+2. brcom-central-1, - Deleted vpnconnection for gbcom, please monitor for next run and check further.
+3, uscom-central-1, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-41559, - need storage team assistance, please check
+
+Meshteat failure
+
+
+HO:
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-41769, OS issue, suggest to include OS team, if they need compute team assistance, please help.
+
+HO:
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-42004, file system not mounted. requested site details, please check if we can get instance details.
+
+HO:
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-42233, 
+
+
+
+HO by US,
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-42511, Customer updated requested details, please investigate further.
+
+
+HO:
+
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-43363, 2 instances are in stopping status, hosted on same node, please investigate further.
+
+HO: 
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-43622, BM node down, no instance running on it, please check if its part of maintainence and boot back.
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-42813, customer requesting RCA, i didn't get any clue.. someone please check
+
+
+
+Handing off infra on-cal to Gopi, 3 new incidents/alarms were reported due to Nodepool upgrade, and auto resolved
+https://confluence.oci.oraclecorp.com/pages/viewpage.action?pageId=2435747189
+
+
+
+
+Team, reported 1 incident DMP-3300 and got auto resolved, need your help to find the RCA
+
+
+i have completed 3/4 tickets, could you please someone take care last one, https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-44681
+
+
+
+2 incidents reported,
+https://jira-sd.mc1.oracleiaas.com/browse/DMP-3477 - Resolved
+https://jira-sd.mc1.oracleiaas.com/browse/DMP-3476 - Inprocess, test pod created on kube-system namespace, asked user to remove that, please follow up.
+
+
+
+
+reg decomm script discussion, Chaitanya told, we discuss this things on monday when he planned for decomm den14 clusters 
+
+
+
+
+ACCS: Cannot satisfy both the availability domain and placement requirements while starting the compute resources
+
+
+
+
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-45232
+
+
+
+HO:
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-47850 for OCI-C AMS DNS RCA.
+https://jira-sd.mc1.oracleiaas.com/browse/OCICIAAS-47849 for OCI-C DB Node issue.

@@ -1,0 +1,191 @@
+
+SOPs:
+https://confluence.oraclecorp.com/confluence/display/OPSKB/Sherlock%3A+DNS+Named+Misconfiguration
+https://confluence.oraclecorp.com/confluence/display/NIM/DNS+Service+Overview
+https://confluence.oci.oraclecorp.com/display/OCICOCI/OCICOCI%3A+DNS+lookup+problems+from+instances+SOP
+https://confluence.oci.oraclecorp.com/display/OCICBM/Higgs+Instance+DNS+%28dns_forwarder%29+impacts
+
+https://confluence.oraclecorp.com/confluence/display/CNS/Higgs+Networking+Debug+Procedures
+
+
+API DNS cleanup and restart:
+
+https://bitbucket.oci.oraclecorp.com/projects/OCICCOMPUTE/repos/ocic-developer/browse/users/jbar/restart_dns_services.sh
+
+
+ OCI DNS server: 169.254.169.254
+
+oc-service triage dns --instance /Compute-594756848/victoria.richardson@croydon.gov.uk/paas/JaaS/CroydonJCS/wls/vm-1/1eccf45f-f37f-418e-9094-15f9ef41e1da  --dns egpa.fa.em3.oraclecloud.com --basic
+
+- if named not getting started compare the directory permission
+
+oc-service admin sudo 'ls -ald /etc/nimbula/named/' admin_cluster 
+
+
+
+ps aux | grep dns
+ip netns
+ip link list
+ip link show opc-2gw
+brctl show dnsbr0
+sudo ip netns exec opc-2 ip link list
+
+dnsbr0    <--  ops-2gw
+netns     <--  opc-2ipn
+
+sudo ip netns exec opc-2 route
+
+sudo bconfget cluster.api_dns_ips
+
+
+ip netns list  ---> list the network namespace
+ip netns exec opc-2 bash  ---> to exter network namespace 
+
+
+control plane DNS:
+bdns_0, bdns_1
+bdns_ip_0, bdns_ip_1  (secondary private ip)
+
+api / instance DNS:
+api_dns_ip_0, api_dns_ip_1
+named_api_0, named_api_1
+
+
+Flat network DNS:  dnsmask running per vm
+
+dnsmask  > named_api(dom0) > named_api(controlnode) > bdns_api_secondary(control) > db
+
+Higgs (ip netword): dnsmasq running per network namespace(ip network)
+
+dnsmask  > dns_forwarder > named_api(dom0) > named_api(controlnode) > bdns_api_secondary(control) > db
+
+
+
+bastion:
+oc-service admin zktree /dns
+
+control node: 
+sudo /usr/lib/nimbula/zktree /dns
+
+
+
+uuid path: /var/lib/bic/uuid
+
+
+
+/etc/nimbula/bic/bdns_ip_0 status
+
+oc-service admin check-zk
+
+10.51.40.64/26
+
+65 gateway
+66,67  dns_ips      (secondary ip)   controlnode dns
+68,69  api_dns_ips  (third ip)       api/instance dns
+
+70,71  bdns,bdns_ip,named_ip,api_dns_ip
+
+
+
+updtream dns:
+169.254.10.1    oci       dnsbr0
+169.254.0.1     ocic
+
+
+
+/etc/nimbula/bic/primary_dns_ip status
+
+oc-service triage dns --basic --no-sherlock
+
+10.51.49.32/28"  - 16  guest   38,39
+router": "10.51.49.33" 
+
+Control Plane DNS:
+
+"dns_ips": [                      
+      "10.51.49.34",   bdns_ip_0     bdns_0    .38  , 42
+      "10.51.49.35"    bdns_ip_1     bdns_1    .39
+
+API/Instance DNS:
+"api_dns_ips": [
+      "10.51.49.36",   api_dns_ip_0    named_api_0    .40
+      "10.51.49.37"    api_dns_ip_1     named_api_1    .41
+
+
+
+"api_upstream_dns": [
+      "10.202.9.102"
+
+
+
+"api_upstream_dns": [
+      "10.193.137.102", 
+      "10.160.204.54", 
+      "10.227.45.71"
+
+10.51.52.176/28          guest cluster
+ 
+10.51.52.177 router
+
+10.51.52.178 dns_ip
+10.51.52.179 dns_ip
+
+10.51.52.180  api_dns_ip
+10.51.52.181  api_dns_ip
+
+
+
+
+
+
+
+
+
+
+
+nimbula.api.clusterdns
+service.bdns.controlplane
+
+
+
+
+
+
+nimbula-admin list node / -Fcluster -H |sort | uniq -c
+nimbula-admin list configpoint /network/dns -Fkey,value -ftab
+
+
+
+https://jira.oraclecorp.com/jira/browse/OCCS-11579
+
+em3:   
+em3-z16 - dns issue
+em3-z19 - dns issue
+em3-z28 - dns issue
+em3-z29 - dns issue
+em3-z31 - dns issue
+em3-z40 - dns issue
+em3-z41 - dns issue
+em2:
+em2-z13 - dns issue
+em2-z24 - dns issue
+
+
+#!/bin/bash
+
+set -x
+oc-service --threads=100 admin sudo 'rm -f /var/cache/nimbula/dns*' all
+oc-service --threads=100 admin sudo 'rm -f /var/named/3bf305731dd26307.nzf' all
+oc-service restart bdns_api_primary service:bdns_api_primary
+oc-service restart bdns_api_secondary service:bdns_api_secondary
+oc-service restart named_api_0 service:named_api_0
+oc-service restart named_api_1 service:named_api_1
+oc-service list %named_api%
+set +x
+
+
+
+
+*/30 * * * * monit restart named_api_0
+
+0 * * * * monit restart named_api_1

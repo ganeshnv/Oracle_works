@@ -1,0 +1,55 @@
+Blog post: https://blogs.oracle.com/cloud-infrastructure/post/oracle-launches-oci-digital-media-services-to-accelerate-video-operations-in-oci
+
+Technical documentation:
+Media Flow: https://docs.oracle.com/iaas/Content/dms-mediaflow/home.htm
+Media Streams: https://docs.oracle.com/iaas/Content/dms-mediastream/home.htm
+https://confluence.oci.oraclecorp.com/display/DMP/Digital+Media+Services+Home
+https://confluence.oci.oraclecorp.com/pages/viewpage.action?pageId=688505370
+
+Pricing:
+https://www.oracle.com/cloud/price-list.html#media-flow
+https://www.oracle.com/cloud/price-list.html#media-streams
+
+Bitbucket:
+https://bitbucket.oci.oraclecorp.com/projects/DMP/repos/dig-media-infra/browse
+
+FAQ:
+https://confluence.oci.oraclecorp.com/pages/viewpage.action?spaceKey=DMP&title=MFO+FAQ
+
+service host access(bastion,jumphost)
+https://confluence.oci.oraclecorp.com/display/DMP/Hostclass+Resource+for+login+and+sudo
+
+RUNBOOK
+https://devops.oci.oraclecorp.com/runbooks/DMP/index
+
+Environment
+https://confluence.oci.oraclecorp.com/display/DMP/Environments
+
+
+Tickets:
+
+https://jira-sd.mc1.oracleiaas.com/browse/DMP-2779 -- No Cluster Metrics
+Q: nood pool upgrade
+
+Q: 2 tickets for same issue
+
+
+
+29/9 - Upendra
+2/10 - Upendra
+3/10 - Upendra
+5/10 - Upendra
+
+22/9 - Ganesh
+26/9 - Ganesh
+28/9 - Ganesh
+6/10 - Ganesh
+
+
+
+https://jira-sd.mc1.oracleiaas.com/browse/NOC-163723
+
+
+
+
+

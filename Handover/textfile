@@ -1,0 +1,49 @@
+name,data,shares,price
+"AA","2007-06-11",100,32.20
+"BB","2008-06-12",200,50
+
+
+
+https://confluence.oci.oraclecorp.com/pages/viewpage.action?spaceKey=OCICPT&title=Handover : Handover
+
+https://confluence.oci.oraclecorp.com/display/OCICCOMP/Handover+Tool : Handover Tool
+
+create a directory in the home directory
+mkdir handover
+cd handover
+
+git clone ssh://git@bitbucket.oci.oraclecorp.com:7999/ociccompute/support-ops-handover-tool.git
+cd /path/to/support_ops_handover_tool
+make install
+--------------
+you will need your ssh config activated for SECEDGE
+cd /Users/srampa/.ssh/ssh_configs/
+git remote -v
+
+include the .ssh/config file
+srampa@srampa-mac .ssh % cat config 
+Include /Users/srampa/.ssh/ociccp-ssh-config/*.config
+Include /Users/srampa/.ssh/ssh_configs/config
+srampa@srampa-mac .ssh %
+
+and create the creds.json with below details:
+{
+confluence_username	"ocicsupportops_za@oracle.com"
+confluence_password	"95nn4YSzfaMhYFv"
+sso_username	"mos.tsietsi@oracle.com"
+sso_password	"********"
+global_uid	"mtsietsi"
+ocna_password	"********" <token password before tapping the yubikey>
+opc_cloud_server_account_password	"*********"<15 digit password>
+nimbulaadmin_password	"********"
+
+}
+6:40
+origin  ssh://git@bitbucket.oci.oraclecorp.com:7999/ociccompute/support-ops-handover-tool.git (fetch)
+origin  ssh://git@bitbucket.oci.oraclecorp.com:7999/ociccompute/support-ops-handover-tool.git (push)
+
+
+then run
+source venv/bin/activate
+unset http_proxy && unset https_proxy && unset HTTP_PROXY && unset HTTPS_PROXY && unset no_proxy
+python3 create_handover_page.py
