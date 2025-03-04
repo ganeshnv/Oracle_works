@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tomcat-hostpath
+
+spec:
+  containers:
+    - name: tomcat-container
+      image: vishymails/tomcatimage:1.0
+      volumeMounts:
+        - name: test-vol
+          mountPath: /oracle-volume1
+
+  volumes:
+    - name: test-vol
+      hostPath:
+        path: /test-vol

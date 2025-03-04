@@ -1,0 +1,292 @@
+myaccess.oracle-ocna.com - ganesh.v.vadivel:gavadive92+yubikey
+myaccess-india.oraclevpn.com -- gavadive_in:Jus09now@
+
+
+sudo xenstore-ls /local/domain/1367/data/opc-guest-agent
+bconfget profile.monitoring.diamond.prefix
+
+
+https://horizonoac-idkzdoic6acl-ia.analytics.ocp.oraclecloud.com/ui/analytics/saw.dll?Portal
+
+https://idcs-######.identity.oraclecloud.com/ui/v1/adminconsole
+
+
+
+
+
+
+
+ssh key for oci devops repo
+ssh-keygen -t rsa -f $HOME/.ssh/id_rsa -C 'ganesh.v.vadivel@oracle.com'
+convert to pem format:
+ssh-keygen -f $HOME/.ssh/id_rsa.pub -e -m pkcs8
+
+.ssh/config
+Host devops.scmservice.*.oci.oraclecloud.com
+User username@tenency
+IdentityFile ~/.ssh/id_rsa
+
+ocr-docker-remote.artifactory.oci.oraclecorp.com/os/oraclelinux:7-slim
+
+Please help us with below details:
+
+1) Is this OCI or OCI-C ?
+
+2) if it is OCI-C, Please help us with zone/site details.. you have mentioned us2 DC1.. but we have many sites in US region.. like us2-zxx 
+
+3) or you can even help us with instance/orchestration full path 
+
+4) or public ip also help us to fetch your detatils.
+
+[root@0-10-e0-c1-c1-6b ~]# nc -w2 -vz 10.29.207.130  22 
+[root@0-10-e0-c1-c1-6b ~]# getnodeip 
+traceroute -nT 144.21.89.48 -p 22
+sudo monit summary
+nc -zv 129.150.176.126 22
+. ocenv -u /admin/gavadive --nodeuser nimbulaadmin
+sudo /usr/lib/nimbula/bic-service /etc/nimbula/bic/bnode stop
+/usr/libexec/higgs/higgs-gateway-agent status
+/usr/lib/nimbula/check_rabbit_cluster_health.py
+sudo /usr/libexec/higgs/higgs-goldengate-server verify
+cat smoketest
+   Cl0ud_WD_SmokeTest
+
+sudo nmap -sU -p 53 10.51.26.44
+systemctl -t service
+
+
+emusr/kMzavrsaju
+
+nmap -Pn 10.51.53.148 ---  check whether host is up
+tcpdump -envi bond0 'host 148.244.195.53'
+
+tcpdump -envi 198227eth1
+
+sudo journalctl -u hm_submitter --no-pager | head
+
+ssh ocicociprod-ams-em2z23-control01
+
+siterepair -i OrchestrationV2Bump --container /Compute-602520911/suporte@accerte.com.br/RIZZO_WIN_001
+siterepair -i OrchestrationV1Bump --container /Compute-641407429/oracle-wd-smoketest_ww@oracle.com/op_testDatapathBetweenTwoIPNetsViaExchange_2a1816ebd8-0712-023939194
+siterepair --container /Compute-641407429/oracle-wd-smoketest_ww@oracle.com/op_testDatapathBetweenTwoIPNetsViaExchange_2a1816ebd8-0712-023939194
+siterepair --container /Compute-lbaaseucom/LBAASEUCOM_LBAASCONTROLPLANE8_LBAASCONTROLPLANE_APPID/z14-1163-lb8-nginx1-7-instance --issues OrchestrationV1Bump
+
+
+ansible -i /tmp/hosts -m ping  -u gavadive --ask-pass all | tee ansible_result
+ansible -i /tmp/hosts -m ping  -u gavadive --ask-pass -s --ask-sudo-pass all
+ansible all -i "lpclc2r801ru19.usdc6.oraclecloud.com," -m command -a "cat /tmp/disable.sh" -u gavadive --ask-pass -s --ask-sudo-pass
+ansible all -i "lpclc2r801ru19.usdc6.oraclecloud.com," -m script -a "./disable.sh" -u gavadive --ask-pass
+
+simple launch: 
+https://confluence.oraclecorp.com/confluence/display/OCCPS/OCI-C+Collecting+Info+and+Troubleshooting
+
+https://confluence.oraclecorp.com/confluence/display/OCCPS/Increase+Storage+space+for+instance+file+system
+
+crowdstrike update
+sudo /Applications/Falcon.app/Contents/Resources/falconctl load
+
+ssh-add -l
+ssh-add -s /usr/local/lib/opensc-pkcs11.so
+verify again ssh-add -l
+
+
+
+python ocic_customerInfoFrom_PublicIP.py -s .p -u /admin/str -p 160.34.11.207,160.34.11.222,160.34.11.130 
+
+convert to pem file
+
+ssh-keygen -f .ssh/id_rsa.pub -e -m pkcs8
+
+ssh -L 8001:localhost:8001 opc@192.168.0.12 -i key.pem   --- ssh tunneling
+
+
+
+=================================================== API Calls =========================================================
+
+while [ 1 ] ; do date ; opc -p us6z11 --pd /Users/str/opc_cli compute shape list  | head -2 ; done 
+
+for i in 10.51.22.138 10.51.22.139 10.51.22.140 10.51.22.141 ; do echo $i ; time nimbula-api list shape / -fcsv -a https://$i:445| wc -l ; done
+
+https://orahub.oci.oraclecorp.com/sajeev_nambidi/scripts
+
+python3 ocic_customerInfoFrom_PublicIP.py -p $ip -u /admin/akshatag -s .p
+
+129.144.154.1
+
+To unlock user:
+pam_tally2 -u str
+if any failures,
+pam_tally2 --user=str --reset
+
+
+Add service to monit,
+/usr/lib/nimbula/monit-service-manager add bdns_ip_0
+/usr/lib/nimbula/monit-service-manager add bnode
+
+ssh ocicociprod-iad-us6z16-us6z16-guest-1-dom0-node02
+curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254/opc/v2/instance/id
+
+
+bash <(curl -fsSL https://objectstorage.us-phoenix-1.oraclecloud.com/p/8SZtJiu8aRNn9yZEABsbzjW38kLHoBbQrWzN08VmF_w/n/picops/b/mr-trouble/o/scripts/ssh-troubleshooter) vcn12.ob.uk-london-1.oci.oraclecloud.com
+Classic Zones => OCI Regions Region Code (aka Airport)
+        us2 => us-phoenix-1 (PHX)
+        us6 => us-ashburn-1 (IAD)
+        em2 => eu-amsterdam-1 (AMS)
+        em3 => uk-london-1 (LHR)
+
+    For ADs:
+        gbcomsouth1 => uk-london-1 (LHR)
+        eucomnorth1 => eu-amsterdam-1 (AMS)
+        brcomcentral1 => sa-saopaulo-1 (GRU)
+        uscomcentral1 => us-phoenix-1 (PHX)
+        uscomeast1 => us-ashburn-1 (IAD)
+        aucomeast1 => ap-sydney-1 (SYD)
+
+for instance in `cat instances`; do line=$(nimbula-api get instance $instance -fjson | grep orchestration);orch=$(echo "$line" | cut -d ':' -f2| tr -d '",');echo "Orchestration: $orch";nimbula-api get orchestration $orch -fjson | grep 'ha_policy' | head -n 1;done
+while true; do sleep 1; nimbula-api -i as /Compute-611977073/smmartins@itim.com suspend orchestrationv2 /Compute-611977073/smmartins@itim.com/Windows2008GPA; done
+
+while IFS=',' read -r Zone OCID; do echo $Zone; oci compute instance list -c $OCID --all --output json | jq -r '.data[].shape' | sort | uniq -c; done < <(tail -n +2 comp.txt)
+
+find HA_policy status,
+for i in $(nimbula-api list orchestration /Compute-603837743 -Fname -H | egrep -v 'tresources|resources|databag'); do nimbula-api get  orchestration $i  -fjson | jq -r '[.list[]|.name, .oplans[].ha_policy] |@csv'; done | tr -d '"'
+
+find all resources of account
+for obj in $(nimbula-api list 2>&1|sed -e "s/.* list //"|cut -d' ' -f1);do echo "----- $obj ----" ; nimbula-api list $obj /Compute-<cust-id> -HFname,username;done | tee resource.data
+
+ssh emusr@10.60.13.8
+
+ssh opsadm@10.127.139.180(ipmi_ip)   ILOM
+show faulty
+show /SYS power_state
+show /System/Open_Problems
+start /SP/Console
+
+reset /SYS    -- to reboot
+stop /SYS     -- to power off
+
+-> start /SP/faultmgmt/shell/
+Are you sure you want to start /SP/faultmgmt/shell (y/n)? y
+
+faultmgmtsp> fmadm faulty
+No faults found
+faultmgmtsp> 
+
+kubectl get pods -A -o jsonpath='{range .items[?(@.spec.nodeName)]}{.spec.nodeName}{"\n"}{end}'| sort | uniq -c | sort -rn
+
+opsadm  -- IuaJiYPBaU
+
+
+
+lroot/d3c0mm3!   -- den14 ilom credentials
+
+docker run -it -v /Users/gavadive/tool-config/den18:/config phx.ocir.io/axmj6pug6zl7/ociccp-deployer:latest bash
+docker run -it -v /Users/gavadive/tool-config/ucfc1z5k:/config phx.ocir.io/axmj6pug6zl7/ociccp-tools-control:0.1.711
+
+
+den14/dom0 -- 100.75.65.134
+user:nimbulaadmin
+password - Cwac0MB!
+Cwac0MB!
+
+[root@control02 ~]# /etc/nimbula/bic/frontend-nginx start
+sudo ipmitool sunoem cli "show faulty"
+sudo /etc/nimbula/bic/bnode status
+
+sudo odoctl docker run -it --rm --net=host -v /home/xiaohanl/tool-config/us6z12:/config -v /home/xiaohanl/sherlock-19.1.4-20210616-052240:/sherlock/artifacts -e SHERLOCK_VERSION=19.1.4-20210616-052240 iad.ocir.io/axmj6pug6zl7/ociccp-tools-control:latest
+
+sudo odoctl docker run -it --rm --net=host -v /home/bprv/tool-config/uscomeast1:/config -v /home/$(whoami)/sites:/sites iad.ocir.io/axmj6pug6zl7/ociccp-tools-control:0.1.932
+
+
+sudo odoctl docker run -it --rm --net=host -v /home/gavadive/tool-config/uscomeast1:/config -v /home/$(whoami)/sites:/sites iad.ocir.io/axmj6pug6zl7/ociccp-tools-control:0.1.967
+
+yum makecache fast
+
+meshtest public key
+
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA1Jn85A4mGyinaJ+zNmq09ImfK9HzThhPGaEt/dL2mRGFswSIWN5QQrkswa6ivCjFcUpamdsqhIgXh0Y8E5X23lfIXYk55QbU4utAqvm0HqW/Un44ASxX6ZI7f4Wj706Gq4e6HnEI9QFoHLoMngkYw02hCMKpInNNCcYEfo+KbaLWIvbIzvERo+KVmQS5Ew3jK1HD46zjtuIfXvwQEOYAiUKs9EJQUlUPPlQ0hqbpXfxWDaT6OXWcnOWK1CXH3Pc0Ef8JLjKPdixf+wwHjg2fMwisdQt5gy+h5QKUTEz2Yp2Ns8LYzRRveEm5wPuiOapVYa8Gq9CBCeUde3W6kqXZuQ==
+
+meshtest private key
+
+-----BEGIN RSA PRIVATE KEY-----
+MIIEoQIBAAKCAQEA1Jn85A4mGyinaJ+zNmq09ImfK9HzThhPGaEt/dL2mRGFswSI
+WN5QQrkswa6ivCjFcUpamdsqhIgXh0Y8E5X23lfIXYk55QbU4utAqvm0HqW/Un44
+ASxX6ZI7f4Wj706Gq4e6HnEI9QFoHLoMngkYw02hCMKpInNNCcYEfo+KbaLWIvbI
+zvERo+KVmQS5Ew3jK1HD46zjtuIfXvwQEOYAiUKs9EJQUlUPPlQ0hqbpXfxWDaT6
+OXWcnOWK1CXH3Pc0Ef8JLjKPdixf+wwHjg2fMwisdQt5gy+h5QKUTEz2Yp2Ns8LY
+zRRveEm5wPuiOapVYa8Gq9CBCeUde3W6kqXZuQIBIwKCAQAkcitaS5GA/6eriRdo
+ahBkb10ddHLaMA2PXXWZOhulNjQtUTvx+jmlCc0ohFZpZhM3/h4pAP/5dmpu9hjt
+aipSAGt9v8DILQ6NTOaDtccbMltP+GFfSW4oCnCZhJ/Cn79Qmuy0wuuXtxkpfvrZ
+Q2NUrjjc7iufgXrru4u97LilFEmcK1YGd/S3vbedlZJYFIj2YQ1/+9CuO8Gj789h
+ZwiDTehA1f8cezgFqtw+X0M1bygoeC7rTP74QQ69Wz0DGlIUhmAdhMU1lfIE1H/L
+NdLpw0y0vHjHBk2Qudeh72r6vmx2311HxKw4DVUX3cZrxgCpWXtNmFTtzyVJ1Nvg
+ZG5zAoGBAPeTNKf75JakH9aRU/FuVdl3XxGb2RVa3q0Pc20MEwpoSGj0tw/oiwCh
+YKDaaSj8fcNcjjs9jnLu2RxOXKGiOzS7M4uaOLZsm1qSC30hoKSmpBQEZSplsmI5
+UCt7+JpkbDDhtxsSXiFg/Mey8YtFBrEzG3GKuTw8V4VB9hCt47WXAoGBANvWGqsC
+phIlRWVFyEdNlZVsEeOH7De4/DNokb6h+e8jCSPaqvBDpfJ75DmVvLhUdihvrwKf
+UK+wkO3f35eoonXfEPeSc1qmUQGiKPZLCFbjcVj9BY6UgyXfdlRKX8FHhTlx9MhC
+uwwlqdcC0bwqoKBStEXcdAAM/+lgJfydIvUvAoGAFTiA2zLZFDn0GbSvbHcr7hGL
+zk8v3UJNmc4f1iWbO2gGNOHGjFXCxYos2pZgyP+zAh3gTjh57JghPPDGHHuerL+W
+tDHKWMd7B8NgEgoyV0F7xzOTpIxfv0a9upWY90pvrGseUscPYfJez0naMIJCZvXA
+hhM0cuCZyZfwhRY4FuECgYEAz0Y2ZrlawKbMZszEJfixm4MmzzcDSns27qRsKMSb
+Me3VavK+bYGcdunXLvrlItNK1ashWj5wpaZ6BNplGfbFEAzVe7X3u96kJhyNBXnx
+64X9KASBlQ+u2pDdSCjd8L/GwSJNMdiEeSrTVbIzduZc7u7kfGIkOo/p+UwGjxfQ
+gMUCgYBS3Afd+bT6U7SqZDjOEfkHYLRacvsiSia37rXWihDToq+XjHSQjOE1jcwX
+ItSEjs+YbVaPVWaaoIFPyiOUCDZdvtkhYVhkotyTKKPq6WZXUVlblvGYGGJGo1gU
+XvWHEBQ0FWH0pqlWpQyXOjYFu/Qn+9hTVzsCszwplhWLN3vKDw==
+-----END RSA PRIVATE KEY-----
+
+clear; while read id zone; do   SITE=`echo $zone |  sed 's/00//g' | sed 's/_/-/g'`; echo "Site is $SITE"   API=https://`grep -i compute-$SITE /etc/octab | awk '{ print $2}'`;  if ! nimbula-api -a  $API -u /root/root -p .pass list instance / -Fname,account,ip,state,desired_state,componentType,nimbula_orchestration,isManaged,availability_domain -fcsv | grep $id;    then      echo "$id instance is not running";  fi;  echo ""; done <id
+
+
+
+
+[100.75.65.72] unsynchronised
+[100.75.65.76] synchronised to unspecified at stratum 5
+[100.75.65.82] synchronised to unspecified at stratum 5
+[100.75.65.83] synchronised to unspecified at stratum 5
+
+
+
+
+
+[root@control01 opc]# cat instance_to_error.py 
+import  sys
+import imp
+
+if len(sys.argv) < 2:
+    raise Exception("You must specify an instance name as an argument.")
+
+instance_name = sys.argv[1]
+
+print "Instance: %s" % instance_name
+
+bsitedb = imp.load_source('bsitedb', '/usr/lib/nimbula/bsitedb')
+config = bsitedb.get_config('bsite')
+
+from bsite.models import Instance
+Instance._transport = bsitedb.get_transport(config)
+
+ins = Instance.get(name=instance_name)
+ins.state = u'error'
+ins.save()
+[root@control01 opc]#
+
+
+#!/bin/bash
+echo "Checking compute objects for account $1"
+echo  "Instances: "
+nimbula-api list instance -fcsv -Favailability_domain,state,name $1 | grep /  | cut -d, -f-2 | sort | uniq -c
+echo "Orchestrations v1: "
+nimbula-api list orchestration -fcsv -Fstatus,name $1 | grep / | cut -d, -f1 | sort | uniq -c
+echo "Orchestrations v2: "
+nimbula-api list orchestrationv2 -fcsv -Fstatus,name $1 | grep / | cut -d, -f1 | sort | uniq -c
+echo  "Storagevols: "
+nimbula-api list storagevolume -fcsv -Favailability_domain,status,name $1 | grep / | cut -d, -f-2 | sort | uniq -c
+echo  "Storage snapshots: "
+nimbula-api list storagesnapshot -fcsv -Fstatus,name $1 | grep / | cut -d, -f1 | sort | uniq -c
+echo  "IP reservations , flat: "
+nimbula-api list ipreservation -fcsv -Fused,parentpool,name $1 | grep / | cut -d, -f-2 | sort | uniq -c
+echo  "IP reservations , Higgs: "
+nimbula-api list ipaddressreservation -fcsv -FipAddressPool,name $1 | grep / | cut -d, -f1 | sort | uniq -c
+echo  "Databag: "
+nimbula-api list databag -fcsv -Fstatus,name $1 | grep / | cut -d/ -f-2 | sort | uniq -c

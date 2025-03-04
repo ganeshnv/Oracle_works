@@ -1,0 +1,19 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa-resource-metrics-memory
+  namespace: default
+spec:
+ scaleTargetRef:
+   apiVersion: v1
+   kind: deploy
+   name: tomcat-deploy
+ minReplicas: 3
+ maxReplicas: 10
+ metrics:
+   - type: Resources
+     resources:
+       name: memory
+       target: 
+         type: AverageValue
+         averageValue: 500Mi

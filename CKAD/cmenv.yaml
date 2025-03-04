@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myconfigpod
+  labels:
+    name: myconfigpod
+
+spec:
+  containers:
+    - name: myconfigpod
+      image: redis
+      env:
+        - name: DB_USERNAME
+          valueFrom:
+            configMapKeyRef: 
+              name: myconfig
+              key: db_host_name
+
+        - name: DB_URL
+          valueFrom:
+            configMapKeyRef:
+              name: myconfig
+              key: db_url

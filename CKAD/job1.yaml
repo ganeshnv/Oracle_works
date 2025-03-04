@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sleep20
+spec:
+  completion: 3
+  parallelism: 6
+  template:
+    metadata: 
+      name: sleep20
+
+
+    spec:
+      containers:
+        - name: sleep20
+          image: centos:7
+          command: ["/bin/bash", "-c", "import time;print('started......'); time.sleep(20); print('done')"]
+      restartPolicy: Never

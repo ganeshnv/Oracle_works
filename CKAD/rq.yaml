@@ -1,0 +1,11 @@
+apiVersion: v1
+kond: ResourceQuota
+metadata:
+  name: demo1-quota
+spec:
+  hard: 
+    pods: '3'
+    limits.cpu: '1'
+    limits.memory: '2Gi'
+    limits.ephemeral-storage: "5Gi"
+    

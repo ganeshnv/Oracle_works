@@ -1,0 +1,137 @@
+
+phx  us2  uscom-central-1   Chicago 
+iad  us6  uscom-east-1      Ashburn 
+ams  em2  eucom-north-1     Amsterdam
+lhr  em3  gbcom-south-1     London
+syd       aucom-east-1      sydney
+gru       brcom-central-1   Sao Paulo
+
+fra       eucomnorth1/fradev107 Frankfurt     (eucom-north-1, gbcom-south-1 )
+
+lhr       gbgov-south-2     London Govt
+phx       usgov-central-1   Chicago Govt
+phx       usgov-east-1      Chicago Govt
+
+ u'160.34.127.0/24',  OCNAv2 India West (Mumbai) 
+ u'160.34.115.0/24',  OCNAv2 US East (Ashburn) 
+ u'160.34.113.0/24',  OCNAv2 US West (San Jose) 
+ u'160.34.124.0/24',  OCNAv2 Australia East (Sydney)
+ u'160.34.92.0/23'  OCNAv1 Seattle SE3-C-SEC-VPN-01 
+
+api:
+api-z29.compute.em3.oraclecloud.com is an alias for compute.em3.oraclecloud.com.
+compute.em3.oraclecloud.com  141.145.34.188
+compute.em2.oraclecloud.com  160.34.18.185
+compute.us2.oraclecloud.com  160.34.1.85
+compute.us6.oraclecloud.com  129.152.32.98
+
+compute.uscom-east-1.oraclecloud.com has address 129.158.3.4
+compute.uscom-central-1.oraclecloud.com has address 129.150.3.3
+compute.aucom-east-1.oraclecloud.com has address 129.154.3.2
+compute.eucom-north-1.oraclecloud.com has address 130.162.3.5
+compute.gbcom-south-1.oraclecloud.com has address 144.21.3.6
+compute.brcom-central-1.oraclecloud.com has address 192.29.138.21
+
+compute.gbgov-south-2.oraclecloud.com has address 129.145.134.9
+compute.usgov-central-1.oraclecloud.com has address 129.152.80.41
+compute.usgov-east-1.oraclecloud.com has address 129.157.16.58
+
+
+oc-service -a https://10.51.20.10:445 -u /root/root -p /home/gavadive/.pass --nodeuser nimbulaadmin -n /home/gavadive/.node_pass list bdns_0
+nimbula-admin -a https://10.51.21.42:445 -u /root/root -p pass list instanceadmin /Compute-lhrairport/David.Sutton@capgemini.com/pbiapps_vm/11bdd798-75fb-4b82-a12a-60adfecd7b70 -Fnode
+
+
+Automate:
+
+var/log rotate
+remove old smoketest instances
+dns duplicate removal
+ntp sync
+
+
+
+
+
+control node / vcp 
+guest node / dom0
+higgs-gw-higgs_gateway01
+higgs-gw-higgs_gateway02
+higgs-goldengate-server01
+higgs-goldengate-server02
+racdb
+
+Error: CrowdStrike antimalware is not active.
+Solution: sudo /Applications/Falcon.app/Contents/Resources/falconctl load
+
+tpaas_report_secret_key: c7hy17auNklnmdGMNqsLbv9iMDAn06Oe+9vG+hGLRD4=
+tpaas_report_access_key: eacfd225bc97ab5ce11850f9897925d79ab02cf8
+
+bmc_operator_access/gavadive
+oci_auth_token :  7fFYGCRH2I{Z5y[Q)ayj
+access_key: 36f2bed90676de9a56b36e10538c29e52570f839
+secret_key: kmMIm7mhFPc4DTMulctkjZkEnhjSUFsOOOx5fdrPXe8=
+
+[ocicociprod]
+aws_access_key_id=36f2bed90676de9a56b36e10538c29e52570f839
+aws_secret_access_key=kmMIm7mhFPc4DTMulctkjZkEnhjSUFsOOOx5fdrPXe8=
+
+https://confluence.oraclecorp.com/confluence/display/DCI/Common+Nimbula+Procedures
+
+
+
+sudo bash -x oc-config-corente-tunnel   OCICIAAS-49466 Chaitanya
+./account_cleanup OCICIAAS-47785 Bala
+
+
+
+for i in `find . -name bm_helper.sh`; do sed -i 's/\/tmp\/upload/\/run\/odo\/docker.sock:\/var\/run\/docker.sock -v \/tmp\/upload/g' $i; done
+
+yum install -y https://artifactory.oci.oraclecorp.com/graalvm-release-yum-local/ee/22.3.2/jdk17/x86_64/graalvm22-ee-17-jdk-22.3.2-1.el7.x86_64.rpm 
+
+
+docker run -P -d -v /home/opc/tpaas/deploy/nginx/:/etc/nginx/conf.d/ -v /home/opc/local_results/:/usr/share/nginx/html/ -p 9011:80 iad.ocir.io/cwdinfradev/cwd/nginx:1.19
+
+
+idcs for ocicocidev:
+https://idcs-f0da39892cea4fdc9de2628112b01694.identity.oraclecloud.com/ui/v1/adminconsole
+
+ganesh.v.vadivel@oracle.com / Jus04now@oci
+
+
+
+top
+iftop, atop, htop
+vmstat 1
+mpstat 1
+iostat -x 1
+pidstat 1
+ss -ant
+sar -n DEV 1
+perf record
+perf report
+strace -tp `pgrep java`
+dmesg -T
+smem
+
+
+
+cpu:
+top, htop, atop
+lscpu
+mpcpu
+pidstat 1
+
+memory:
+free -m
+vmstat
+smem
+
+Disk:
+iostat -x 1
+
+network:
+iftop
+sar -n DEV 1
+
+socket:
+ss -ant

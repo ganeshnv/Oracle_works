@@ -1,0 +1,124 @@
+
+
+[root@localhost nimbulaadmin]# xm list | grep f28f
+bdb1c8f0-5afa-4283-a9f8-9e1bddb8f28f 30 30723 4 b--- 430762.3
+[root@localhost nimbulaadmin]# ifconfig | grep f28f
+b8f28feth0 Link encap:Ethernet HWaddr C6:B0:AC:0A:0A:08
+[root@localhost nimbulaadmin]# tcpdump -envi b8f28feth0
+
+
+
+nimbula-api launch simple /oracle/public/OL_6.8_UEKR4_x86_64_PSM_MANAGED-18.3.2-20180627-131137 oc1m 1
+nimbula-api launch simple /oracle/public/psm-jcs-image-22.2.0.0.1086.220429053133 oc1m 1 --seclist /Compute-586178700/sre_syseng_ww_grp@oracle.com/ssh-access --ippool /oracle/public/ippool --sshkeys /Compute-586178700/sre_syseng_ww_grp@oracle.com/nmesh_key  -fjson
+
+
+CHANGE
+Compute Classic BM Node's Relauch ---   CHANGE-1704264
+
+
+Can you do norollback=true, so that they are not wiped out and we can find orch details 
+
+nimbula-admin list instanceadmin  /admin/gavadive/ -Fstart_time,state,ip,shape,node,imagelist,availability_domain,tag,error_reason,name -H  | sort 
+
+[gavadive@lpclc2r801ru19 compute-us6-z70 ~]$ which oc-service
+alias oc-service='execCommand /usr/bin/oc-service -a https://10.51.20.10:445 -u /root/root -p /home/gavadive/.ssh/.Bfuu7jmqh.secret --nodeuser nimbulaadmin -n /home/gavadive/.ssh/.AYNQJwxgv.secret'
+[gavadive@lpclc2r801ru19 compute-us6-z70 ~]$
+
+
+
+oc-service -a https://10.51.20.10:445 -u /root/root -p /home/gavadive/.pass --nodeuser nimbulaadmin -n /home/gavadive/.node_pass list bdns_0
+
+for i in `cat api`; do oc-service -a https://$i:445 -u /root/root -p /home/gavadive/.pass --nodeuser nimbulaadmin -n /home/gavadive/.node_pass admin sudo "ps aux | grep rsyslog | grep -v grep" guest_cluster; done
+
+
+
+0, nimbula-api list ipaddressreservation /oracle/internal -fcsv -FipAddress,name,ipAddressPool,description | sort -n | grep -i psm
+1, nimbula-api add ipaddressreservation /oracle/internal/PSM-Server4-10.51.84.74 --description "IP for PSM OCI server OCICIAAS-46431" --ipAddressPool /oracle/internal/service-cloud-ippool -fjson
+2, nimbula-api add physicalipnat /oracle/internal/PSM-Server4-OCI-10.51.84.74 --physicalIpAddress 10.51.84.74 --reachableIpAddress 100.66.0.33 -fjson
+3, nimbula-api list ipaddressprefixset /oracle/public/paas-infra  -fjson | tee ipaddrpfxs.${NIMBULA_SITE}.46431.pre1
+4, nimbula-api update ipaddressprefixset /oracle/public/paas-infra --ipAddressPrefixes '100.66.0.0/32,100.66.0.65/32,100.66.0.64/32,100.66.0.29/32,100.66.0.28/32,100.66.0.69/32,100.66.0.70/32,100.66.0.68/32,100.66.0.71/32,100.66.0.72/32,100.66.0.66/32,100.66.0.67/32,100.66.0.75/32,100.66.0.76/32,100.66.0.74/32,100.66.0.73/32,100.66.0.33/32' -fjson  | tee ipaddrpfxs.${NIMBULA_SITE}.46431.post1 ; diff  ipaddrpfxs.${NIMBULA_SITE}.46431.pre1 ipaddrpfxs.${NIMBULA_SITE}.46431.post1
+
+
+
+Host ocicociprod-phx-us2z53-us2z53-guest-1-dom0-node01
+    Hostname 10.51.50.166
+
+Host ocicociprod-phx-* !ocicociprod-phx-bastion !ocicociprod-phx-jumphost*
+    ProxyJump ocicociprod-phx-jumphost
+
+Host ocicociprod-phx-jumphost
+    Hostname 172.16.95.123
+    ProxyJump ocicociprod-phx-bastion
+
+Host ocicociprod-phx-bastion
+    Hostname vcn3.ob.us-phoenix-1.oci.oraclecloud.com
+
+
+
+
+Host 172.22.*
+  ProxyCommand ssh jump_host_phx -W %h:%p
+
+Host jump_host_phx
+  HostName ocid1.bastion.oc1.phx.amaaaaaaghr2qfyasuxwqvnwacjrxmvp7tcaodmkkb6thyngef3hr2whnswa-192.168.9.3
+  ProxyJump overlay_endpoint_phx
+
+Host overlay_endpoint_phx
+  HostName overlay-host.bastion.us-phoenix-1.oci.oracleiaas.com
+
+
+
+can we implement rsyslog memory limit on us2z25 ? where most of the nodes having more than 50% of memory used by rsyslog
+
+
+
+for i in `cat bm_nodes`; do nimbula-exec -s rsyslog.sh --clusters=$i; done
+
+for i in `cat bm_nodes`; do oc-service admin sudo "ps aux | grep rsyslog | grep -v grep" $i; done
+
+oc-service admin sudo "ps aux | grep rsyslog | grep -v grep" guest_cluster
+
+cert check:
+
+openssl s_client -showcerts -connect compute.brcom-central-1.oraclecloud.com:443 2>/dev/null|  openssl x509 -issuer -subject -dates -noout 
+issuer= /C=US/O=DigiCert Inc/CN=DigiCert TLS RSA SHA256 2020 CA1
+subject= /C=US/ST=California/L=Redwood City/O=Oracle Corporation/OU=Oracle CSEC-ENG SAOPAULO/CN=*.brcom-central-1.oraclecloud.com
+
+
+api endpoints:
+api-z14.compute.em2.oraclecloud.com  -- em2-z14
+compute.brcom-central-1.oraclecloud.com  -- brcom-central-1
+
+
+
+openssl s_client -showcerts -connect tpaas.ocws.us-ashburn-1.oci.oraclecloud.com:443 2>/dev/null|  openssl x509 -issuer -subject -dates -noout 
+issuer= /C=US/O=DigiCert Inc/CN=DigiCert TLS RSA SHA256 2020 CA1
+subject= /C=US/ST=California/L=Redwood City/O=Oracle Corporation/OU=Oracle CSEC-ENG SAOPAULO/CN=*.ocws.us-ashburn-1.oci.oraclecloud.com
+
+
+
+oauth2-proxy-cwd-internal-root   secretName: oauth2-proxy-cwd-internal
+oauth2-proxy-cwd-internal        secretName: oauth2-proxy-cwd-internal
+oauth2-proxy-cwd-root            secretName: tpaas-server
+oauth2-proxy-webshell            secretName: tpaas-server
+oauth2-proxy-report-server       secretName: tpaas-server
+oauth2-proxy-cwd                 secretName: tpaas-server
+oauth2-proxy-tpaas-api-report    secretName: tpaas-server
+oauth2-proxy-tpaas-api           secretName: tpaas-server
+oauth2-proxy-tpaas-ui            secretName: tpaas-server
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

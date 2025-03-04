@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: tomcat-rc
+spec:
+  replicas: 4
+  selector: 
+    app: tomcat-app
+
+  template:
+    metadata:
+      name: tomcat-pod
+      labels:
+        app: tomcat-apps
+  
+    spec:
+      containers:
+        - name: tomcat-container
+          image: vishymails/tomcatimage:1.0
+          ports:
+            - containerPorts: 8080

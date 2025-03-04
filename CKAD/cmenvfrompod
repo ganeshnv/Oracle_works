@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myconfigpod1
+  labels:
+    name: myconfigpod1
+
+spec:
+  containers:
+    - name: myconfigpod1
+      image: busybox
+      envFrom:
+        - configMapRef:
+            name: myconfig

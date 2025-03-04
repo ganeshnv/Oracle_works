@@ -1,0 +1,45 @@
+Artificial Intelligence
+    Machine Learning:
+        Process:
+        Loading data
+        Preprocessing
+        Training a model
+        Evaluating the model
+        making predictions  
+        Type:
+        1,  supervised machine Learning  -- Learns from labeled data
+                Regression  -- continuous (resale price of home)
+                Classification  -- categorical
+        2,  unsupervised machine learning
+        3,  reinforcement machine learning
+
+        Deep Learning:
+
+            Type:
+                1, Image and videos
+                2, 
+
+               
+                
+            Models:
+                Feed Forward Neural Network (FNN)
+                Convolution Neural Network (CNN)  -- Detect patterns in (visual data)images
+                Recurrent Neural Network (RNN)  -- design to handle sequence data(struggle to handle long sequence data)
+                Type:
+                   One-to-one
+                   One-to-many
+                   Many-to-one
+                   Many-to-many
+                Variational Autoencoders
+                Long Short-Term Memory (LSTM)
+                Generative Adversarial Network (GAN)  - widely use for image generation task
+                Transformers  - text based modes
+
+            Generative AI:
+                Type:
+                    Image based
+                    Text based
+                Large Language Models:
+                    Lifecycle:
+                        pretraining(unsupervised) > fine tuning(supervised) > prompt Engineering > Evaluation and iteration > Deployment and maintenance
+                             
