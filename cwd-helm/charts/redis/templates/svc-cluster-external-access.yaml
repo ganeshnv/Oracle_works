@@ -1,0 +1,40 @@
+{{- if .Values.cluster.externalAccess.enabled }}
+{{- $fullName := include "redis.fullname" . }}
+{{- $nodesCount := .Values.cluster.nodes | int }}
+{{- $root := . }}
+
+{{- range $i, $e := until $nodesCount }}
+{{- $targetPod := printf "%s-node-%d" (printf "%s" $fullName) $i }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-{{ $i }}-svc
+  labels:
+    release: {{ $root.Release.Name }}
+    pod: {{ $targetPod }}
+{{- if $root.Values.cluster.externalAccess.service.annotations }}
+  annotations: {{- toYaml $root.Values.cluster.externalAccess.service.annotations | nindent 4 }}
+{{- end }}
+spec:
+  type: {{ $root.Values.cluster.externalAccess.service.type }}
+{{/*  {{- if $root.Values.cluster.externalAccess.service.loadBalancerIP }}*/}}
+{{/*  loadBalancerIP: {{ index $root.Values.cluster.externalAccess.service.loadBalancerIP $i }}*/}}
+{{/*  {{- end }}*/}}
+  ports:
+    - name: redis
+      port: {{ $root.Values.cluster.externalAccess.service.port }}
+      targetPort: redis
+    - name: redis-bus
+      targetPort: redis-bus
+      port: {{ $root.Values.cluster.externalAccess.service.busPort }}
+    - name: redis-sentinel
+      port: {{ $root.Values.sentinel.service.sentinelPort }}
+      targetPort: redis-sentinel
+  selector:
+    release: {{ $root.Release.Name }}
+    statefulset.kubernetes.io/pod-name: {{ $targetPod }}
+---
+{{- end }}
+{{- end }}

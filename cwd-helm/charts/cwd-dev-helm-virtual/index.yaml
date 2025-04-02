@@ -1,0 +1,188 @@
+apiVersion: v1
+entries:
+  logging-operator:
+  - apiVersion: v1
+    created: 2020-11-13T17:58:43.055Z
+    description: A Helm chart to install Banzai Cloud logging-operator
+    digest: dd47b1bebea358619f287e21a063542c85844e728764e79acd4e0f071ed8ab6b
+    name: logging-operator
+    urls:
+    - https://artifactory.oci.oraclecorp.com:443/api/helm/cwd-dev-helm-virtual/logging-operator/logging-operator-3.0.0.tgz
+    appVersion: "3.0.0"
+    version: "3.0.0"
+  ingress-nginx:
+  - apiVersion: v2
+    created: 2022-10-04T21:22:36.888Z
+    description: Ingress controller for Kubernetes using NGINX as a reverse proxy and load balancer
+    digest: d78eb2bf1080a7c2191ca9180cb1a1dbe52ff2851ba61bb152b27eee3851d497
+    home: https://github.com/kubernetes/ingress-nginx
+    icon: https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Nginx_logo.svg/500px-Nginx_logo.svg.png
+    keywords:
+    - ingress
+    - nginx
+    maintainers:
+    - name: rikatz
+    - name: strongjz
+    - name: tao12345666333
+    name: ingress-nginx
+    sources:
+    - https://github.com/kubernetes/ingress-nginx
+    urls:
+    - https://artifactory.oci.oraclecorp.com:443/api/helm/cwd-dev-helm-virtual/nginx-ingress/nginx-ingress-4.3.0.tgz
+    appVersion: "1.4.0"
+    version: "4.3.0"
+  cert-manager:
+  - apiVersion: v1
+    created: 2020-11-13T18:47:24.568Z
+    description: A Helm chart for cert-manager
+    digest: 72a997299d615a92540eb5a22b2fca7c518b36160c4e998f9d6940bc3c108835
+    home: https://github.com/jetstack/cert-manager
+    icon: https://raw.githubusercontent.com/jetstack/cert-manager/master/logo/logo.png
+    keywords:
+    - cert-manager
+    - kube-lego
+    - letsencrypt
+    - tls
+    maintainers:
+    - email: james@jetstack.io
+      name: munnerz
+    name: cert-manager
+    sources:
+    - https://github.com/jetstack/cert-manager
+    urls:
+    - https://artifactory.oci.oraclecorp.com:443/api/helm/cwd-dev-helm-virtual/cert-manager/cert-manager-v0.15.0.tgz
+    appVersion: "v0.15.0"
+    version: "v0.15.0"
+  logging-operator-logging:
+  - apiVersion: v1
+    created: 2020-11-13T17:01:10.138Z
+    description: A Helm chart to configure logging resource for the logging-operator
+    digest: 0672f3e1776d2591ef1368e5c4b87547dbdabce5ed12a57fc979ba9272461cb0
+    icon: https://raw.githubusercontent.com/banzaicloud/logging-operator/master/docs/img/icon.png
+    name: logging-operator-logging
+    urls:
+    - https://artifactory.oci.oraclecorp.com:443/api/helm/cwd-dev-helm-virtual/logging-operator-logging/logging-operator-logging-2.7.2.tgz
+    appVersion: "2.7.0"
+    version: "2.7.2"
+  vault-secrets-webhook:
+  - apiVersion: v1
+    created: 2020-11-13T17:00:28.404Z
+    description: A Helm chart that deploys a mutating admission webhook that configures applications to request env vars from Vault Secrets
+    digest: 1e59b434643afa38c0119ac638239392f60803a4f87467761c686e95d40b7fd5
+    maintainers:
+    - email: info@banzaicloud.com
+      name: Banzai Cloud
+    name: vault-secrets-webhook
+    urls:
+    - https://artifactory.oci.oraclecorp.com:443/api/helm/cwd-dev-helm-virtual/vault-secrets-webhook/vault-secrets-webhook-0.7.1.tgz
+    appVersion: "0.8.0"
+    version: "0.7.1"
+  vault-operator:
+  - apiVersion: v1
+    created: 2020-11-13T17:00:13.412Z
+    description: A Helm chart for banzaicloud/bank-vaults operator
+    digest: 041295eb4605708cbedc7f8c0c6b3217d9f990701ff84b94028b5433b8d9e1e9
+    home: https://www.vaultproject.io/
+    icon: https://www.vaultproject.io/assets/images/mega-nav/logo-vault-0f83e3d2.svg
+    maintainers:
+    - email: info@banzaicloud.com
+      name: Banzai Cloud
+    name: vault-operator
+    sources:
+    - https://github.com/hashicorp/vault
+    - https://github.com/banzaicloud/bank-vaults
+    - https://github.com/banzaicloud/banzai-charts
+    urls:
+    - https://artifactory.oci.oraclecorp.com:443/api/helm/cwd-dev-helm-virtual/vault-operator/vault-operator-0.6.8.tgz
+    appVersion: "0.9.0"
+    version: "0.6.8"
+  thanos:
+  - apiVersion: v1
+    created: 2020-11-13T18:25:15.829Z
+    description: "Thanos is a set of components that can be composed into a highly available metric system with unlimited storage capacity, which can be added seamlessly on top of existing Prometheus deployments."
+    digest: 0247dddc669ea584e207a6bf2f5025c1d5587ad92b524c484f2ddd8366d8a204
+    icon: https://raw.githubusercontent.com/thanos-io/thanos/master/docs/img/Thanos-logo_fullmedium.png
+    keywords:
+    - thanos
+    - prometheus
+    - metrics
+    maintainers:
+    - email: info@banzaicloud.com
+      name: Banzai Cloud
+    name: thanos
+    sources:
+    - https://github.com/thanos-io/thanos
+    - https://github.com/banzaicloud/banzai-charts/tree/master/thanos
+    urls:
+    - https://artifactory.oci.oraclecorp.com:443/api/helm/cwd-dev-helm-virtual/thanos/thanos-0.3.23.tgz
+    appVersion: "0.10.1"
+    version: "0.3.23"
+  prometheus-operator:
+  - apiVersion: v1
+    created: 2020-11-13T16:49:45.482Z
+    description: "Provides easy monitoring definitions for Kubernetes services, and deployment and management of Prometheus instances."
+    digest: 4e77ff042e1dd5d37570ab4414088fa7bb57bb54d56b324a0a511253abd90d24
+    home: https://github.com/coreos/prometheus-operator
+    icon: https://raw.githubusercontent.com/prometheus/prometheus.github.io/master/assets/prometheus_logo-cb55bb5c346.png
+    keywords:
+    - operator
+    - prometheus
+    maintainers:
+    - name: vsliouniaev
+    - name: bismarck
+    - email: gianrubio@gmail.com
+      name: gianrubio
+    name: prometheus-operator
+    sources:
+    - https://github.com/coreos/prometheus-operator
+    - https://coreos.com/operators/prometheus
+    urls:
+    - https://artifactory.oci.oraclecorp.com:443/api/helm/cwd-dev-helm-virtual/prometheus-operator/prometheus-operator-7.5.0.tgz
+    appVersion: "0.34.0"
+    version: "7.5.0"
+  nginx-ingress:
+  - apiVersion: v1
+    created: 2020-11-13T16:59:38.417Z
+    description: An nginx Ingress controller that uses ConfigMap to store the nginx configuration.
+    digest: a5bcd090d98fb9a7701856053bea277ff8a50d9328bf54398665982cfabf4476
+    home: https://github.com/kubernetes/ingress-nginx
+    icon: https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Nginx_logo.svg/500px-Nginx_logo.svg.png
+    keywords:
+    - ingress
+    - nginx
+    maintainers:
+    - name: ChiefAlexander
+    - email: Trevor.G.Wood@gmail.com
+      name: taharah
+    name: nginx-ingress
+    sources:
+    - https://github.com/kubernetes/ingress-nginx
+    urls:
+    - https://artifactory.oci.oraclecorp.com:443/api/helm/cwd-dev-helm-virtual/nginx-ingress/nginx-ingress-1.40.2.tgz
+    appVersion: "0.32.0"
+    version: "1.40.2"
+  vault:
+  - apiVersion: v2
+    created: 2020-11-13T17:00:38.532Z
+    description: Official HashiCorp Vault Chart
+    digest: 989eda97712030a30b408f18de693d4591734c113256981119da6817c29079dc
+    home: https://www.vaultproject.io
+    icon: https://github.com/hashicorp/vault/raw/f22d202cde2018f9455dec755118a9b84586e082/Vault_PrimaryLogo_Black.png
+    keywords:
+    - vault
+    - security
+    - encryption
+    - secrets
+    - management
+    - automation
+    - infrastructure
+    name: vault
+    sources:
+    - https://github.com/hashicorp/vault
+    - https://github.com/hashicorp/vault-helm
+    - https://github.com/hashicorp/vault-k8s
+    urls:
+    - https://artifactory.oci.oraclecorp.com:443/api/helm/cwd-dev-helm-virtual/vault/vault-0.6.0.tgz
+    appVersion: "1.4.2"
+    version: "0.6.0"
+generated: 2022-10-04T21:22:36.888Z

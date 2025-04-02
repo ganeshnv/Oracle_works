@@ -1,0 +1,482 @@
+# Default values for oauth2-proxy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: iad.ocir.io/cwdinfradev/infra/oauth2-proxy
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "1.2-staging"
+  ldapTag: "1.4-staging"
+
+imagePullSecrets:
+  - name: ocir-secret
+nameOverride: ""
+fullnameOverride: ""
+
+extraLabels: {}
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+portal:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    name: portal
+    port: 4180
+  container:
+    port: 4180
+  config:
+    provider: oracle
+    emailDomain: oracle.com
+    upstream: http://tpaas-server-ui:19002
+    scope: UserProfile.me
+    # clientId and clientSecret are the same for portal/api/cwd
+    clientId: cwd-staging-WdrLB4L93vyShWqFs0GYz
+    clientSecret: this-is-not-the-secret
+    redirectUrl: https://tpaas.ocws.us-ashburn-1.oci.oc-test.com/login/oauth2/oracle
+    httpAddress: 0.0.0.0:4180
+    cookieSecure: false
+    cookieSecret: ShY9SPpOhd0QOcVaKkPGKQ==
+    cookieExpire: 15m
+api:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 4180
+  container:
+    port: 4180
+  config:
+    provider: oracle
+    emailDomain: oracle.com
+    upstream: http://tpaas-server-api:19000
+    scope: cwd-staging.tpaas
+    clientId: cwd-staging-WdrLB4L93vyShWqFs0GYz
+    clientSecret: this-is-not-the-secret
+    redirectUrl: https://tpaas.ocws.us-ashburn-1.oci.oc-test.com/login/oauth2/oracle
+    httpAddress: 0.0.0.0:4180
+    cookieSecure: false
+    cookieSecret: ShY9SPpOhd0QOcVaKkPGKQ==
+    cookieExpire: 15m
+reportServer:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 4180
+  container:
+    port: 4180
+  config:
+    provider: oracle
+    emailDomain: oracle.com
+    upstream: http://tpaas-server-report-server:18081
+    scope: cwd-staging.tpaas
+    clientId: cwd-staging-WdrLB4L93vyShWqFs0GYz
+    clientSecret: this-is-not-the-secret
+    redirectUrl: https://tpaas.ocws.us-ashburn-1.oci.oc-test.com/login/oauth2/oracle
+    httpAddress: 0.0.0.0:4180
+    cookieSecure: false
+    cookieSecret: ShY9SPpOhd0QOcVaKkPGKQ==
+    cookieExpire: 15m
+webshell:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 4180
+  container:
+    port: 4180
+  config:
+    provider: oracle
+    emailDomain: oracle.com
+    upstream: http://tpaas-server-webshell:18090
+    scope: cwd-staging.tpaas
+    clientId: cwd-staging-WdrLB4L93vyShWqFs0GYz
+    clientSecret: this-is-not-the-secret
+    redirectUrl: https://tpaas.ocws.us-ashburn-1.oci.oc-test.com/login/oauth2/oracle
+    httpAddress: 0.0.0.0:4180
+    cookieSecure: false
+    cookieSecret: ShY9SPpOhd0QOcVaKkPGKQ==
+    cookieExpire: 15m
+cwd:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 4180
+  container:
+    port: 4180
+  config:
+    provider: oracle
+    emailDomain: oracle.com
+    scope: cwd-staging.cwd
+    clientId: cwd-staging-WdrLB4L93vyShWqFs0GYz
+    clientSecret: this-is-not-the-secret
+    redirectUrl: https://portal.ocws.us-ashburn-1.oci.oc-test.com/login/oauth2/oracle
+    httpAddress: 0.0.0.0:4180
+    cookieSecure: false
+    cookieSecret: ShY9SPpOhd0QOcVaKkPGKQ==
+    whitelistDomains: portal.ocws.us-ashburn-1.oci.oc-test.com
+    cookieExpire: 15m
+    profileUrl: http://cwd-ldap:9000/api/v1/ldap/userId/groups
+    internal:
+      scope: UserProfile.me
+      redirectUrl: https://portal-internal.ocws.us-ashburn-1.oci.oc-test.com/login/oauth2/oracle
+      clientId: cwd-staging-lRTVSbWfqNBQLVnT1zpaQ
+      clientSecret: vault:secret/data/cwd-staging/apps/cloudwatchdog/oauth2#INTERNAL_CLIENT_SECRET
+      whitelistDomains: portal-internal.ocws.us-ashburn-1.oci.oc-test.com
+  nginx:
+    replicaCount: 2
+    image:
+      repository: "iad.ocir.io/dataservicedev1/nginx"
+      tag: "1.14.2"
+      pullPolicy: IfNotPresent
+    service:
+      type: ClusterIP
+      port: 80
+    container:
+      port: 80
+    config:
+      host: gpwghtbrdpqwpnx-cwd.adb.us-ashburn-1.oraclecloudapps.com
+  internal:
+    nginx:
+      config:
+        host: gpwghtbrdpqwpnx-qalab.adb.us-ashburn-1.oraclecloudapps.com
+
+
+ingress:
+  ssl:
+    enabled: true
+    name: oauth2-proxy
+    cwdInternal:
+      tls_crt: |-
+        -----BEGIN CERTIFICATE-----
+        MIIHJTCCBg2gAwIBAgIQAtLiLuA9EUPXxb+oR3Q8kTANBgkqhkiG9w0BAQsFADBP
+        MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMSkwJwYDVQQDEyBE
+        aWdpQ2VydCBUTFMgUlNBIFNIQTI1NiAyMDIwIENBMTAeFw0yMTA0MTIwMDAwMDBa
+        Fw0yMjA0MjAyMzU5NTlaMIG8MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZv
+        cm5pYTEVMBMGA1UEBxMMUmVkd29vZCBDaXR5MRswGQYDVQQKExJPcmFjbGUgQ29y
+        cG9yYXRpb24xKDAmBgNVBAsMH0Nsb3VkQEN1c3RvbWVyIENsb3VkIE9wZXJhdGlv
+        bnMxOjA4BgNVBAMTMXBvcnRhbC1pbnRlcm5hbC5vY3dzLnVzLWFzaGJ1cm4tMS5v
+        Y2kub2MtdGVzdC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCo
+        rxEi+NiKMVQz+EZyjqQLBfK9hANPR1qhHSsFDNfigwlzoKaiJK2E18drJvL+L8aU
+        AXVkQaAFt8ZmFijzEyLooxp6Kjb6w0Fr7YXT3Dl4XcWhwRuXeIt8nBN6Gu9Nx8Zv
+        rqWEmFN32vH2xpCN0eeeu+09AM91Jo96ycZP6FxYTkZ0qEhg+mAX+Nx+dN0kgp/1
+        UQuYgji9WVbMfPiESsKdvCRY8deO8HVkG0vuPX2nVDW/oCTeaC1Npg8eGp+WUp9/
+        d0MkeKzd1f5GzjppGBqRq8TGiwELWx1LH2HKh4vD9WXXo5Fd61cnU95N26KZQZ1g
+        hfAIQEhZgiQAunmkKg6vAgMBAAGjggONMIIDiTAfBgNVHSMEGDAWgBS3a6LqqKqE
+        jHnqtNoPmLLFlXa59DAdBgNVHQ4EFgQUAz/ZIGdhinVfcK2PQmYaM3EghAswPAYD
+        VR0RBDUwM4IxcG9ydGFsLWludGVybmFsLm9jd3MudXMtYXNoYnVybi0xLm9jaS5v
+        Yy10ZXN0LmNvbTAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEG
+        CCsGAQUFBwMCMIGLBgNVHR8EgYMwgYAwPqA8oDqGOGh0dHA6Ly9jcmwzLmRpZ2lj
+        ZXJ0LmNvbS9EaWdpQ2VydFRMU1JTQVNIQTI1NjIwMjBDQTEuY3JsMD6gPKA6hjho
+        dHRwOi8vY3JsNC5kaWdpY2VydC5jb20vRGlnaUNlcnRUTFNSU0FTSEEyNTYyMDIw
+        Q0ExLmNybDA+BgNVHSAENzA1MDMGBmeBDAECAjApMCcGCCsGAQUFBwIBFhtodHRw
+        Oi8vd3d3LmRpZ2ljZXJ0LmNvbS9DUFMwfQYIKwYBBQUHAQEEcTBvMCQGCCsGAQUF
+        BzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wRwYIKwYBBQUHMAKGO2h0dHA6
+        Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydFRMU1JTQVNIQTI1NjIwMjBD
+        QTEuY3J0MAwGA1UdEwEB/wQCMAAwggF9BgorBgEEAdZ5AgQCBIIBbQSCAWkBZwB2
+        ACl5vvCeOTkh8FZzn2Old+W+V32cYAr4+U1dJlwlXceEAAABeMhb1XwAAAQDAEcw
+        RQIhAOX6ckKNDe9Q1Bec+YusWhTQ31C+TSBRozcytTVzg4WbAiAt8LU2Cvh6PLF/
+        PN2815m/lmVWdssq8wrOXG7e3WMSYwB2ACJFRQdZVSRWlj+hL/H3bYbgIyZjrcBL
+        f13Gg1xu4g8CAAABeMhb1UAAAAQDAEcwRQIhANaI1a8naC+CeRAUvwUkowAfmLk9
+        48DmMkqqE2EdjcaJAiAGx5opxECrVr5r4QiLfSzOa3KpLWlmu7vDhNvxPLhAFgB1
+        AFGjsPX9AXmcVm24N3iPDKR6zBsny/eeiEKaDf7UiwXlAAABeMhb1WQAAAQDAEYw
+        RAIgPQ0tx+OtAiEnJVrE/3U9NDQM7VdOQyqHkbXKDTsKv84CIC/iJ1va6rB3Lbmt
+        p6xq+KxAjOhQZ/oZGT8m1bRyBdS9MA0GCSqGSIb3DQEBCwUAA4IBAQAKDjQrgRsf
+        Ep64M/agybRgCUMwcs+hUsA3eOVmDahcpKmveLQBCfZSBa6JT2p6K15BZgHQf11k
+        OxKo9mY5MWEWH3xBwkhel9PrFO3/I/avubWAOFwqM5lr8me6nLB6ruT5trm3/hD+
+        OK6e6X3oLz0rBcOaFlNKypwYCXd9WqZKI2Wb/+0UCvPFTuExs4rTRfHNreqMOfsG
+        2myF8FtlerrrHda1aU/i/9ilHH6c1+hn8LCBNsQ3GjMevSqZjIItgjm9T42oFy6y
+        STpFI3uef1BhBhcqBtRvMQJh5+9SoV6VxOa9/Dp+3Y+4UgldGhQ8yHHX5CUrAYS+
+        9JHOHhxk3NT1
+        -----END CERTIFICATE-----
+
+      tls_key: |-
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEpAIBAAKCAQEAqK8RIvjYijFUM/hGco6kCwXyvYQDT0daoR0rBQzX4oMJc6Cm
+        oiSthNfHayby/i/GlAF1ZEGgBbfGZhYo8xMi6KMaeio2+sNBa+2F09w5eF3FocEb
+        l3iLfJwTehrvTcfGb66lhJhTd9rx9saQjdHnnrvtPQDPdSaPesnGT+hcWE5GdKhI
+        YPpgF/jcfnTdJIKf9VELmII4vVlWzHz4hErCnbwkWPHXjvB1ZBtL7j19p1Q1v6Ak
+        3mgtTaYPHhqfllKff3dDJHis3dX+Rs46aRgakavExosBC1sdSx9hyoeLw/Vl16OR
+        XetXJ1PeTduimUGdYIXwCEBIWYIkALp5pCoOrwIDAQABAoIBAFrRrwNKQaPdvT0h
+        3iQNgmrg7/lzWyjS/QujnabhbFZrQKp9g1nnL3lHh/m8BbYvWNYVFvQ8lQCfGnWa
+        Vr/QvMnODxJZKjLG77FBN/2CI3sX2bEmPEnIQCl+CsqCN/eDqOY2fK0wKjhsrDu2
+        WtvQeMkw2yEuD4Q+l59/hYM+UoHD+0rvGEy7ToMg/0LSVdvhThjPne5Ejj/9jom7
+        2vpHBkyZiaKFZk9MXvv/lbArQUJSBpCuvyvTpnoxE2Etw9aMiUEsfxO8CTSO70Va
+        /0csm4OVh10gX2FkwieG/JBOpTHCKdn894n8o8bZVykv9zJRg7G8cBOPpMhd+NAy
+        hPNo5hkCgYEA0WV+iQ62fWFDx+TyQGKuuinYj93+NU7BxZsa30fApJexY0cOZD7c
+        8asm85bA2gwGezjV9ADzcOIxUqGooHXgWL42aIsNzDf6/j6JRESgpeEARqCF3JOG
+        vy6Zjh35ovhqJc62jYVR3ZF6L3QFiO6lhmBG3l5hWyjrWnq65YJtbEsCgYEAzjnx
+        uI+Ngno7Q0B/vdi5ViQPDXFonwmotRbtiAAyrF+dsTPKtEN7xu6aREaPlip0PXaf
+        eSi3LytUmUvoK1Zzkbmdi2vpeV2dRii2dRXoADiLjGhR8UFZZSd2bGMDl6oYR5nX
+        uXOXWdNlOOvDVePN+9t/bmoFDrG7xd9yBW37oK0CgYEAyxyZ+rQsy72XE8S+Pzn5
+        plaE3DhHJso4J0dmb4KYGI+T32rDSPW5Nyn/ZHSsqFTVzJy63C439R1THoX0nYD5
+        ltsax5lqTtdWPVvHplKzSXPQ4rE+Z1EqeTPoevQUe8JepEG4zdmuKS+9x13RKJvk
+        L04gL/54jQZKFL/Lnmg/X7UCgYEAodROnynnPhB1GN0wYOYE6lf5h+8KzmJiBVks
+        pKCjIykVMc0WsEaUhxMN8637VzeRZ/oCQq10sosqI/GxCvEYV650tsfDuv1/QWMJ
+        au/50tKMj239f3hskjhZccxxMT7FNsq+wkS27EI7GGPKMUhGh/FDGn4P4ewPEcO6
+        UhBweTECgYAqP/xImkZPtaixMSbqiIpaKTkUX3BoqWdotP+R26kTKcimUnj8VW/3
+        M8xOYj4nH4KswLzdMegTqrMPZNp1riRd/SwEoldgJp3vzHK4fLAy0VgigQ5DXoPO
+        zq3cj6BwEK9TFpcpKuADkP6OlkFjkkoQ2uLKSnun/BuXjtNz39yIiQ==
+        -----END RSA PRIVATE KEY-----
+    cwd:
+      tls_crt: |-
+        -----BEGIN CERTIFICATE-----
+        MIIGVjCCBT6gAwIBAgIQC9x9Xy3BgNrIXxGLqPJ4mTANBgkqhkiG9w0BAQsFADBP
+        MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMSkwJwYDVQQDEyBE
+        aWdpQ2VydCBUTFMgUlNBIFNIQTI1NiAyMDIwIENBMTAeFw0yMTAxMjYwMDAwMDBa
+        Fw0yMjAxMzAyMzU5NTlaMH0xCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9y
+        bmlhMRUwEwYDVQQHEwxSZWR3b29kIENpdHkxGzAZBgNVBAoTEk9yYWNsZSBDb3Jw
+        b3JhdGlvbjElMCMGA1UEAxMcY2xvdWR3YXRjaGRvZy5vcmFjbGVjb3JwLmNvbTCC
+        ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOV+kcA3TG+j3MQDqNbgMBwD
+        84zGxHarROylkVYVjZYo981LvLAP8DHYBWVnEa9tktIYqTtxTQx5VuJX28nEfGAZ
+        SDDzcO+w6EwGtwnLTcYWzYyN66Fbszg2Gi4KxdxmxfDL8ir9MQ7eN508zJRmXYV9
+        7cpKKxZSF4sMbYQOyAZkLK3Fcr7a+RXCJZG6C6ciQTlo5jSk0Zx1/mhvBGi65pv6
+        vJFCKc90zdHYVBMqqG/MZNmXSzm2XtQ6kZ6O0koPmMZqKEM90e7FjH3oUWmWxMo9
+        rQJ4vN+GlDfCFPSBm+zU01lalnFSMH0VidyfZwIZbV5G1E/Zts0zjxfTygmBPaUC
+        AwEAAaOCAv4wggL6MB8GA1UdIwQYMBaAFLdrouqoqoSMeeq02g+YssWVdrn0MB0G
+        A1UdDgQWBBTi2nMQdABbhMQxnVuPyS9tPCtTNjAnBgNVHREEIDAeghxjbG91ZHdh
+        dGNoZG9nLm9yYWNsZWNvcnAuY29tMA4GA1UdDwEB/wQEAwIFoDAdBgNVHSUEFjAU
+        BggrBgEFBQcDAQYIKwYBBQUHAwIwgYsGA1UdHwSBgzCBgDA+oDygOoY4aHR0cDov
+        L2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0VExTUlNBU0hBMjU2MjAyMENBMS5j
+        cmwwPqA8oDqGOGh0dHA6Ly9jcmw0LmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydFRMU1JT
+        QVNIQTI1NjIwMjBDQTEuY3JsMD4GA1UdIAQ3MDUwMwYGZ4EMAQICMCkwJwYIKwYB
+        BQUHAgEWG2h0dHA6Ly93d3cuZGlnaWNlcnQuY29tL0NQUzB9BggrBgEFBQcBAQRx
+        MG8wJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBHBggrBgEF
+        BQcwAoY7aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0VExTUlNB
+        U0hBMjU2MjAyMENBMS5jcnQwDAYDVR0TAQH/BAIwADCCAQMGCisGAQQB1nkCBAIE
+        gfQEgfEA7wB1ACl5vvCeOTkh8FZzn2Old+W+V32cYAr4+U1dJlwlXceEAAABd0Do
+        9GIAAAQDAEYwRAIgbUEPVSvqeT0bRqzER1v2P+X7SWNoDwZhRNL6kNYQeAICICeM
+        qr/01zhUSc6FGywshxjf5XiWlAteCSn+WCoa4uLuAHYAIkVFB1lVJFaWP6Ev8fdt
+        huAjJmOtwEt/XcaDXG7iDwIAAAF3QOj0twAABAMARzBFAiBnVuKZzVkKkLTD3PiZ
+        n0/ADWwVcmGu/2x8mwLkZTA7UgIhAKwL8gEIddWa1WC0Ic6asPj3uEfTdf+pYEiH
+        s2awzulGMA0GCSqGSIb3DQEBCwUAA4IBAQBF4pedoxk3dedK0/w0WoEipLNJxNeL
+        l/K2u+WRL9inGkoMfft+rCnNEseyeJAk+of4QSd6MX76hD1CKCoFIT4YhpihVPZE
+        pFEFGxeveJUZ8JRKUaLUAcDdyR9VPjaHt1tJZLu2zLLjigacGS1kWLU5mWNQ5Dbj
+        5jI4zoUdpvrTLIN7WWzbRjidffz57dOida++pfeDbOU8/XIZGb0IRQxjzN+s7oxN
+        X/6LcsLlIdDMzwt6q7ycotSVXROql+zT5bs3H6HZYGOQB/RLyGYwbMVtnovCrsml
+        J7LX5xm4fZsfGXfKga7RnVdStMLy32TEbJ+X/WtWfomWa1yMgcfN5Bw+
+        -----END CERTIFICATE-----
+
+      tls_key: |-
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEpQIBAAKCAQEA5X6RwDdMb6PcxAOo1uAwHAPzjMbEdqtE7KWRVhWNlij3zUu8
+        sA/wMdgFZWcRr22S0hipO3FNDHlW4lfbycR8YBlIMPNw77DoTAa3CctNxhbNjI3r
+        oVuzODYaLgrF3GbF8MvyKv0xDt43nTzMlGZdhX3tykorFlIXiwxthA7IBmQsrcVy
+        vtr5FcIlkboLpyJBOWjmNKTRnHX+aG8EaLrmm/q8kUIpz3TN0dhUEyqob8xk2ZdL
+        ObZe1DqRno7SSg+YxmooQz3R7sWMfehRaZbEyj2tAni834aUN8IU9IGb7NTTWVqW
+        cVIwfRWJ3J9nAhltXkbUT9m2zTOPF9PKCYE9pQIDAQABAoIBAGjsTCDQZ37nMQjh
+        D3FmQDieydwECFClDzcOn3r3EaukgV74EIWCU/PF6vmofNpyw1yQ79aAf5SDaWjE
+        eHUwAxlAldPjiS/c9ufDbi3pKF63kDSBskgsj6zUd3WzcTDKQBdOdyKWbbZ5fH3E
+        DViP0JQ2td/1tutWjvMAtJVa2LKqfjDvBVDaVaUbe8ExDFCo6E2AbTqj6DK/MKfg
+        qzE5fANBNuYXKDiDYLxj4YF51wQsM/GIs0+V+b4XdFGWGKtWDZzTPmxVxLlsnyL1
+        xBLWk3W/WchRIOob9tOg00lAZ4s6fHW6l/N4srn+T9iRS4Wr0f9B2Z9cODSJST7P
+        k0RBnGECgYEA/bBrcnIubg/l+A2DYNjLIjctQ+EFiijDxuFBnjVb8bHLI0hWaDy/
+        Su1goF34RQKYnA5s5pPu1wHM/UEvP7ySnPhJNOOlUSon3/KLkmqJZoA8kalnfyVG
+        /PKMZ6DuEesDZf54V0LteW0CTbOPdQ5pIN0WvTMDp13jdSvyi/Vupa0CgYEA55W6
+        zRSAQ7QTuQGoBeCsbpdk5z2uLCYQMAAUMbdx4RzBUlwM2AmpBJ2ztNuxS3pd0+ck
+        Kn7cETT0S7lyc8Yi7oDgUp2UcbQbL+1Tv8TE2GvDRTLZ86ZvqvV7MwMCoNS2+C66
+        hUHrThQOZon9xYP5gWy6Aag9Q/KRdIdAbdk/xtkCgYEAicsigXZNi9Cs27ATVS5M
+        H5iSyJTX2nRL6qF9b76R41Tr/o0TCek9CiinXFPOP0WquNEJC7D8gOJkgoa+cEMv
+        63zc3pJrwAtCv1xRvUSKvxcWTxQRuDj6NvhTlRIPXcImBWdT3CnpLRQttSC74hvi
+        tEwCRuAHswfHPWSSiLzVzb0CgYEArlt+3vS2dULZLotes74qVMFLSQaZYcfunBUT
+        HzNcW/5IVvfS+7yaMk2BhYN6grdIeUgnZI9KpPHXlEO1NhFRL3x8Z/cYUlsltPnb
+        +h/tjHvl8u2MRvNiU7aq4Qc9LVW5xDV6XOX6gTh8dxsho1nvuk/f42uFZOj2NmO2
+        UH4mlFECgYEAstd7/65eIvWXPjTYUCtC0kjKVSFviOQRjcNDU9lZ/zQPOLzSU+hv
+        MJNTe7EHeRkiOEbNSHIsIt3Z7vB98xi9WAITGyYFPvNK7om/BnZb7eF22E1TujPF
+        2zuuoUc80NfrjqHGDWygX8eqokLA8H5yvc7YKd3oi56Bq3+1UJ5BONQ=
+        -----END RSA PRIVATE KEY-----
+
+    tls_crt: |-
+      -----BEGIN CERTIFICATE-----
+      MIIHSjCCBjKgAwIBAgIQCLTZ0PXNuz1eyN/Vd9ESzDANBgkqhkiG9w0BAQsFADBN
+      MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMScwJQYDVQQDEx5E
+      aWdpQ2VydCBTSEEyIFNlY3VyZSBTZXJ2ZXIgQ0EwHhcNMjAxMDI5MDAwMDAwWhcN
+      MjExMTAyMjM1OTU5WjCBnzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3Ju
+      aWExFTATBgNVBAcTDFJlZHdvb2QgQ2l0eTEbMBkGA1UEChMST3JhY2xlIENvcnBv
+      cmF0aW9uMRswGQYDVQQLDBJPcmFjbGUgQ0BDIEFTSEJVUk4xKjAoBgNVBAMTIW9j
+      d3MudXMtYXNoYnVybi0xLm9jaS5vYy10ZXN0LmNvbTCCASIwDQYJKoZIhvcNAQEB
+      BQADggEPADCCAQoCggEBAM6mmGL2Q5dvWbCMaiX5r+jOEZszlc2t2qaWJyPpQ7Wz
+      7x51PBjprM9RtCUx9szQcIC8UNN7XMsXXPI884T5jhAWG6hpnr4k6pYYYSVrBn2k
+      75oDqTrYVYZcl0HP1Nujm6Dr/POnZGtkI2PIbSMqulIliiB+9qlMFjf49cP4m0lq
+      wWwJEsPUCjC8C3Ku9drvgSlD3Jj6BLsmS3ke5SsaHVcUqrSatec6gz0DcHiBMXi9
+      sBXd8oKxz0nRlEZzENTgFSpFXBHcBkr943q7rkg7JV7vL8RApd4JXjhZ914SnKFQ
+      pjuCVjYMXgQV85hKHbGIloRhNaMtgOpDR30OLgpOywUCAwEAAaOCA9EwggPNMB8G
+      A1UdIwQYMBaAFA+AYRyCMWHVLyjnjUY4tCzhxtniMB0GA1UdDgQWBBRhgngY0NG0
+      RUrYvhoMar438BEoyDCCAQsGA1UdEQSCAQIwgf+CIW9jd3MudXMtYXNoYnVybi0x
+      Lm9jaS5vYy10ZXN0LmNvbYIndHBhYXMub2N3cy51cy1hc2hidXJuLTEub2NpLm9j
+      LXRlc3QuY29tgihwb3J0YWwub2N3cy51cy1hc2hidXJuLTEub2NpLm9jLXRlc3Qu
+      Y29tgixwcm9tZXRoZXVzLm9jd3MudXMtYXNoYnVybi0xLm9jaS5vYy10ZXN0LmNv
+      bYIpZ3JhZmFuYS5vY3dzLnVzLWFzaGJ1cm4tMS5vY2kub2MtdGVzdC5jb22CLmFs
+      ZXJ0bWFuYWdlci5vY3dzLnVzLWFzaGJ1cm4tMS5vY2kub2MtdGVzdC5jb20wDgYD
+      VR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjBrBgNV
+      HR8EZDBiMC+gLaArhilodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vc3NjYS1zaGEy
+      LWc3LmNybDAvoC2gK4YpaHR0cDovL2NybDQuZGlnaWNlcnQuY29tL3NzY2Etc2hh
+      Mi1nNy5jcmwwTAYDVR0gBEUwQzA3BglghkgBhv1sAQEwKjAoBggrBgEFBQcCARYc
+      aHR0cHM6Ly93d3cuZGlnaWNlcnQuY29tL0NQUzAIBgZngQwBAgIwfAYIKwYBBQUH
+      AQEEcDBuMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wRgYI
+      KwYBBQUHMAKGOmh0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydFNI
+      QTJTZWN1cmVTZXJ2ZXJDQS5jcnQwDAYDVR0TAQH/BAIwADCCAQQGCisGAQQB1nkC
+      BAIEgfUEgfIA8AB3APZclC/RdzAiFFQYCDCUVo7jTRMZM7/fDC8gC8xO8WTjAAAB
+      dXZoaHUAAAQDAEgwRgIhAN3nGHcuCGgV4w2QwoT/G/i8HXtaAEy8269XPIUORBWa
+      AiEAolA5NMV2PhrmbSAsX/cpIdWo+/sz6dkph/Ec8teKZKkAdQBc3EOS/uarRUSx
+      XprUVuYQN/vV+kfcoXOUsl7m9scOygAAAXV2aGi5AAAEAwBGMEQCIA+dt4T46r1g
+      FVo0eAMO4NWmoznRitnaAWKLueH56GxHAiAHaSHSb5vFnQGEu12UYzbbyEACsGXi
+      edb/T3E94jgwqjANBgkqhkiG9w0BAQsFAAOCAQEAPjmQ4L5/NW/oI5lkWOyYAGWA
+      1kDKz8VDoSfg+R8Ttb8FgdxDhIFAMJRx9Kp51/4WlXLmPU+5C32oYSQ/9Trh3Ev+
+      zsVFRdeq3WhNvVX/vN7pPW6RSPNwNE1zeXRqtw7lKxlw5c7pFOGMG7Kixui8M/IB
+      NzO7WbL6sHp0fHbSdJvpM8Ya98kBg7y5BFV26zMkEezJqrG6QqoXndUeh5JuStHz
+      wSul5gfJHqRfjpFRkA6Zr1QGrgUmXiEsXdhKbtM1SkoMQ3zAMy0ZHJU3yuPbatyh
+      WLdC02Y38HYZRimSc9adzEmneeY6IFDF+UgGUkq+rNwDDUUy5fq0LIPFtTaphQ==
+      -----END CERTIFICATE-----
+      -----BEGIN CERTIFICATE-----
+      MIIElDCCA3ygAwIBAgIQAf2j627KdciIQ4tyS8+8kTANBgkqhkiG9w0BAQsFADBh
+      MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3
+      d3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBD
+      QTAeFw0xMzAzMDgxMjAwMDBaFw0yMzAzMDgxMjAwMDBaME0xCzAJBgNVBAYTAlVT
+      MRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxJzAlBgNVBAMTHkRpZ2lDZXJ0IFNIQTIg
+      U2VjdXJlIFNlcnZlciBDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB
+      ANyuWJBNwcQwFZA1W248ghX1LFy949v/cUP6ZCWA1O4Yok3wZtAKc24RmDYXZK83
+      nf36QYSvx6+M/hpzTc8zl5CilodTgyu5pnVILR1WN3vaMTIa16yrBvSqXUu3R0bd
+      KpPDkC55gIDvEwRqFDu1m5K+wgdlTvza/P96rtxcflUxDOg5B6TXvi/TC2rSsd9f
+      /ld0Uzs1gN2ujkSYs58O09rg1/RrKatEp0tYhG2SS4HD2nOLEpdIkARFdRrdNzGX
+      kujNVA075ME/OV4uuPNcfhCOhkEAjUVmR7ChZc6gqikJTvOX6+guqw9ypzAO+sf0
+      /RR3w6RbKFfCs/mC/bdFWJsCAwEAAaOCAVowggFWMBIGA1UdEwEB/wQIMAYBAf8C
+      AQAwDgYDVR0PAQH/BAQDAgGGMDQGCCsGAQUFBwEBBCgwJjAkBggrBgEFBQcwAYYY
+      aHR0cDovL29jc3AuZGlnaWNlcnQuY29tMHsGA1UdHwR0MHIwN6A1oDOGMWh0dHA6
+      Ly9jcmwzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbFJvb3RDQS5jcmwwN6A1
+      oDOGMWh0dHA6Ly9jcmw0LmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbFJvb3RD
+      QS5jcmwwPQYDVR0gBDYwNDAyBgRVHSAAMCowKAYIKwYBBQUHAgEWHGh0dHBzOi8v
+      d3d3LmRpZ2ljZXJ0LmNvbS9DUFMwHQYDVR0OBBYEFA+AYRyCMWHVLyjnjUY4tCzh
+      xtniMB8GA1UdIwQYMBaAFAPeUDVW0Uy7ZvCj4hsbw5eyPdFVMA0GCSqGSIb3DQEB
+      CwUAA4IBAQAjPt9L0jFCpbZ+QlwaRMxp0Wi0XUvgBCFsS+JtzLHgl4+mUwnNqipl
+      5TlPHoOlblyYoiQm5vuh7ZPHLgLGTUq/sELfeNqzqPlt/yGFUzZgTHbO7Djc1lGA
+      8MXW5dRNJ2Srm8c+cftIl7gzbckTB+6WohsYFfZcTEDts8Ls/3HB40f/1LkAtDdC
+      2iDJ6m6K7hQGrn2iWZiIqBtvLfTyyRRfJs8sjX7tN8Cp1Tm5gr8ZDOo0rwAhaPit
+      c+LJMto4JQtV05od8GiG7S5BNO98pVAdvzr508EIDObtHopYJeS4d60tbvVS3bR0
+      j6tJLp07kzQoH3jOlOrHvdPJbRzeXDLz
+      -----END CERTIFICATE-----
+
+
+    tls_key: |-
+      -----BEGIN PRIVATE KEY-----
+      MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDOpphi9kOXb1mw
+      jGol+a/ozhGbM5XNrdqmlicj6UO1s+8edTwY6azPUbQlMfbM0HCAvFDTe1zLF1zy
+      PPOE+Y4QFhuoaZ6+JOqWGGElawZ9pO+aA6k62FWGXJdBz9Tbo5ug6/zzp2RrZCNj
+      yG0jKrpSJYogfvapTBY3+PXD+JtJasFsCRLD1AowvAtyrvXa74EpQ9yY+gS7Jkt5
+      HuUrGh1XFKq0mrXnOoM9A3B4gTF4vbAV3fKCsc9J0ZRGcxDU4BUqRVwR3AZK/eN6
+      u65IOyVe7y/EQKXeCV44WfdeEpyhUKY7glY2DF4EFfOYSh2xiJaEYTWjLYDqQ0d9
+      Di4KTssFAgMBAAECggEACqoCNykqN8hhQoEcgTUvZL4tnmq9Ek4keHBLOMky20+b
+      yWCXZ1m3t0MqHrlDWTJwe9Q7/43gLgLYow+OKZCPSjk52CkLLhjNmk1LxhiNzzIR
+      w0rpEsZTM4nXrGfDPkplH5rOBOzge8JBKUcQir4Lu22AgUjMBdSNWPoaBLDxooot
+      73c+xn3RfRIJkOv5Fs8GuylAc3ljV48QrYwHAIaTDLRW3BxZNtS7BAChRBacxkBU
+      EW7ehY0cUkShVCXLk6W+7wYSeBgqkW+Q55tV5/bGsMbIap64+LvmhzqAhdfzUS7X
+      xqGv4rRdWt2gwY9dhwHP5aBozGWj0JBR788jXKB2gQKBgQD/Cen2OXAzbPLWGXiH
+      I0CXma+UqsUGCZlrjbd2ysj5cqcMnh+fd1wvwPCIX382ZD4lguryzDahBF0hoCYT
+      t3Y0qL1FMA607srcqgjX8Un3fSh+dSeDfEqofaYsTl2Pjkxga9vCZXRggx6zT2pm
+      M+i3m0/7E2h6qLdF2oiPW4CIsQKBgQDPbf3wWs8GO9+3n1dIghUint7yCZ7n6dYh
+      H0b+ANJ1i8KUhCWagsveQOhFJeKT6xXY3E1hyBH5e7tUKVGz4mxBVk80irRwk5kJ
+      mlTccr8FCmNxKjlpRfmBQ1RI/c6zECDQEdlA+Zn0LQWCp6J5FwhC3r/merF6qMjT
+      wQV0nUH8lQKBgDrIDS2cBXlE1h90lWwIOv32BRrt1SVUFxFMA4oUqQedXlUxKLa3
+      av7yqD22TPq7VfuNVhuJ59lqyRBT+hK3ST5P2ffVYL5g/06mvg0PZu3s4eVrmSTc
+      A9UbyK4TjcrlkEL0+RywB4erEOthFXPi6PNQj7mduony0vL9sFXiUBixAoGANof3
+      A1IMLNpetPo5ywEPp1tWxxCKavOJbIm5cxsqOOa2D68x543NJK+xoEQWbcaWpr07
+      xqH/P7QsijKWnRDAXujex7RTPWlACUs+VfoAh8W0YNK15xwTPM1DgjDfPynVRn36
+      vF8h/xQ6559EUksgy9udXW0R7Woj6a9LzN1utIUCgYAxmpklV5GZQSabipkSIEun
+      IXXNwYueq3ytVBKre2JW9hM2LZ96UGjxoby7nxTl1rCEAf5kVWEzoRJjrkUncCNV
+      LdqcGJWuepO2WPb2P9i6j0CwRA6mMIU6aUdUWK0Q5Q0u+d8+4Smak5YSYKA1IB7L
+      X1rjaqMUWgs55rFdEm3+GA==
+      -----END PRIVATE KEY-----
+
+  enabled: true
+  annotations:
+    reportServer:
+      path:
+        nginx.ingress.kubernetes.io/affinity: "cookie"
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+        nginx.ingress.kubernetes.io/rewrite-target: /$1/$2
+    webshell:
+      path:
+        nginx.ingress.kubernetes.io/affinity: "cookie"
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+        nginx.ingress.kubernetes.io/rewrite-target: /$1$2
+    path:
+      nginx.ingress.kubernetes.io/rewrite-target: /$1
+      nginx.ingress.kubernetes.io/affinity: "cookie"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    cwd:
+      rootPath:
+        nginx.ingress.kubernetes.io/rewrite-target: /ords/r/watchdog/cloudwatchdog/compute-based
+        nginx.ingress.kubernetes.io/affinity: "cookie"
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      legacyPath:
+        nginx.ingress.kubernetes.io/permanent-redirect: https://portal.ocws.us-ashburn-1.oci.oc-test.com/ords/r/watchdog/cloudwatchdog/compute-based
+        nginx.ingress.kubernetes.io/affinity: "cookie"
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      internalPath:
+        nginx.ingress.kubernetes.io/rewrite-target: /$1
+        nginx.ingress.kubernetes.io/affinity: "cookie"
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      internalRootPath:
+        nginx.ingress.kubernetes.io/rewrite-target: /ords/r/watchdog/liftandshift/submit-jobs
+        nginx.ingress.kubernetes.io/affinity: "cookie"
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  hosts:
+    - host: ocws.us-ashburn-1.oci.oc-test.com
+      paths: []
+  portal:
+    hostname: tpaas.ocws.us-ashburn-1.oci.oc-test.com
+  api:
+    hostname: tpaas.ocws.us-ashburn-1.oci.oc-test.com
+  cwd:
+    hostname: portal.ocws.us-ashburn-1.oci.oc-test.com
+    internal:
+      hostname: portal-internal.ocws.us-ashburn-1.oci.oc-test.com
+    # if no need the proxy for legacy CWD, just leave the hostname as empty
+    legacy:
+      hostname:
+  reportServer:
+    hostname: tpaas.ocws.us-ashburn-1.oci.oc-test.com
+  webshell:
+    hostname: tpaas.ocws.us-ashburn-1.oci.oc-test.com
+  tls:
+    - secretName: tpaas-server
+      hosts:
+        - "portal.ocws.us-ashburn-1.oci.oc-test.com"
+        - "tpaas.ocws.us-ashburn-1.oci.oc-test.com"
+  tlsInternal:
+    #{{ .Values.ingress.ssl.name }}-cwd
+    - secretName: oauth2-proxy-cwd-internal
+      hosts:
+        - "portal-internal.ocws.us-ashburn-1.oci.oc-test.com"
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

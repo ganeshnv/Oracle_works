@@ -1,0 +1,19 @@
+{{- if .Values.metrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "oci-external-dns.fullname" $ }}
+  labels:
+    {{- include "oci-external-dns.labels" . | nindent 4 }}
+  {{- if .Values.service.annotations }}
+  annotations: {{ toYaml .Values.service.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  ports:
+  - name: http
+    port: {{ .Values.service.port }}
+    protocol: TCP
+    targetPort: http
+  selector: {{ include "oci-external-dns.matchLabels" . | nindent 6 }}
+  type: {{ .Values.service.type }}
+{{- end }}

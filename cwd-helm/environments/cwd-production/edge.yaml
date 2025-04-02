@@ -1,0 +1,54 @@
+ingress-nginx:
+  controller:
+    replicaCount: 3
+    image:
+      repository: iad.ocir.io/cwdinfradev/cwd/ingress-nginx/controller
+      tag: "v1.4.0"
+      digest: []
+    extraArgs:
+      default-ssl-certificate: cwd-apps/oauth2-proxy
+    admissionWebhooks:
+       patch:
+         image:
+           repository: iad.ocir.io/cwdinfradev/cwd/kube-webhook-certgen
+           image: cwdinfradev/cwd/kube-webhook-certgen
+           tag: v20220916
+           digest: []
+  imagePullSecrets:
+    - name: ocirsecret
+
+observer:
+  enabled: true
+  prometheusDirectory: observer
+  prometheusRulesFilePattern: "*.rules"
+
+oci-external-dns:
+  replicas: 0
+  txtOwnerId: "oci_ocws_ww_grp@oracle.com@oracle.com"
+  vaultSecretPath: "secret/data/cwd-production/apps/edge/oci_user"
+  vaultAuthRole: "cwd-production_apps_edge"
+  deploymentAnnotations: {}
+  ociUserFingerprintVaultTmpl: "{{ .Data.data.OCI_USER_FINGERPRINT  }}"
+  # Base64 encoded pem file in Vault.
+#  ociUserPrivateKeyVaultTmpl: "{{ .Data.data.OCI_USER_PRIVATE_KEY | base64Decode | indent 6 }}"
+  ociUserPrivateKeyVaultTmpl: "{{ .Data.data.OCI_USER_PRIVATE_KEY |  indent 6 }}"
+  ociUserId: "ocid1.user.oc1..aaaaaaaanbllaf3qfj4lkwsg3ne7xx2x57pdayj5fiqc3l7gnztgpgxbtaua"
+  tenancyId: "ocid1.tenancy.oc1..aaaaaaaadtguelj353sqsuovd3rcgbw2syayy2a22vh4ydb7jldlcd2a4vgq"
+  region: "us-ashburn-1"
+  compartmentId: "ocid1.compartment.oc1..aaaaaaaabsmdxhcpvr55lkse5255z5r7s2c4trct3kjvspfi3cn6jayh7oza"
+
+  sources: ["ingress"]
+  domainFilters:
+    - "us-ashburn-1.oci.oraclecloud.com"
+
+  extraArgs:
+    oci-config-file: /etc/kubernetes/oci.yaml
+    oci-domain-mode: ""
+  logLevel: "warning"  #panic,fatal,error,warning,info,debug,trace
+
+vault:
+  enabled: false
+
+cert-manager:
+  enabled: false
+

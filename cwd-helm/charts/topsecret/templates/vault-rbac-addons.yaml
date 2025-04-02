@@ -1,0 +1,16 @@
+# User "system:serviceaccount:system-secret:topsecret-vault-operator" cannot create tokenreviews
+# https://github.com/banzaicloud/bank-vaults/issues/657#issuecomment-529827404
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ .Release.Name }}-vault-operator-auth-delegator
+  labels:
+    {{- include "topsecret.labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Release.Name }}-vault-operator
+    namespace: system-secret
+roleRef:
+  kind: ClusterRole
+  name: "system:auth-delegator"
+  apiGroup: rbac.authorization.k8s.io

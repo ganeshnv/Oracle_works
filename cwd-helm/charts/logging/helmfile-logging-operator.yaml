@@ -1,0 +1,25 @@
+helmDefaults:
+  wait: false
+  timeout: 600
+  force: false
+  recreatePods: false
+
+repositories:
+#  - name: cwd-helm
+#    url: https://artifactory.oci.oraclecorp.com:443/cwd-dev-helm-virtual
+#    url: git+https://github.com/banzaicloud/logging-operator@charts/logging-operator?ref=master
+
+environments:
+  {{ .Environment.Name }}: {}
+
+releases:
+  - name: logging-operator
+    namespace: "system"
+
+    chart: ../cwd-dev-helm-virtual/logging-operator/logging-operator
+    version: 3.0.0
+  # without version, it will always pull the latest version of the chart.
+    values:
+      - ./_global_values.yaml
+      - ../../environments/{{ .Environment.Name }}/logging.yaml
+      - createCustomResource: false

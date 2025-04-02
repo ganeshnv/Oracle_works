@@ -1,0 +1,58 @@
+usePassword: true
+password: ShY9SPpOhd0QOcVaKkPGKQ==
+
+image:
+  registry: iad.ocir.io/cwdinfradev/infra
+  repository: redis
+  ## Bitnami Redis image tag
+  ## ref: https://github.com/bitnami/bitnami-docker-redis#supported-tags-and-respective-dockerfile-links
+  ##
+  tag: 6.0.8
+  pullSecrets:
+  - ocirsecret
+  pullPolicy: IfNotPresent
+
+## Cluster settings
+cluster:
+  enabled: true
+  slaveCount: 3
+  nodes: 3
+  externalAccess:
+    enabled: true
+    service:
+      ## Type of service for external access. At this moment only LoadBalancer is supported.
+      ##
+      type: LoadBalancer
+      ## Port used when service type is LoadBalancer
+      ##
+      port: 6379
+      busPort: 16379
+      ## Array of load balancer IPs for each Redis node. Length must be the same as cluster.nodes
+      ##
+      #loadBalancerIP: ["192.168.1.42","192.168.1.45","192.168.1.39"]
+      loadBalancerIP: ["10.0.20.135","10.0.20.134","10.0.20.69"]
+      ## Service annotations done as key:value pairs
+      ##
+      annotations:
+        service.beta.kubernetes.io/oci-load-balancer-internal: "true"
+        service.beta.kubernetes.io/oci-load-balancer-security-list-management-mode: "None"
+
+## Use redis sentinel in the redis pod. This will disable the master and slave services and
+## create one redis service with ports to the sentinel and the redis instances
+sentinel:
+  enabled: true
+  ## Require password authentication on the sentinel itself
+  ## ref: https://redis.io/topics/sentinel
+  usePassword: true
+  ## Bitnami Redis Sentintel image version
+  ## ref: https://hub.docker.com/r/bitnami/redis-sentinel/tags/
+  ##
+  image:
+    registry: iad.ocir.io/cwdinfradev/infra
+    repository: redis-sentinel
+    ## Bitnami Redis image tag
+    ## ref: https://github.com/bitnami/bitnami-docker-redis-sentinel#supported-tags-and-respective-dockerfile-links
+    ##
+    tag: 6.0.8
+    pullSecrets:
+    - ocirsecret

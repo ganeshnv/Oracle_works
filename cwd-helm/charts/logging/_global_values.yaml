@@ -1,0 +1,34 @@
+# Operator: https://github.com/zzmzzm90/logging-operator/tree/master/charts/logging-operator
+image:
+  repository: "iad.ocir.io/dataservicedev1/cre/banzaicloud/logging-operator"
+  tag: "v2.7.0"
+
+##############################################################################
+
+# Common logging: https://github.com/zzmzzm90/logging-operator/tree/master/charts/logging-operator-logging
+logging-common-base:
+  fluentd:
+    image:
+      repository: "iad.ocir.io/dataservicedev1/cre/banzaicloud/fluentd"
+      tag: "v1.7.4"
+    configReloaderImage:
+      repository: "iad.ocir.io/dataservicedev1/jimmidyson/configmap-reload"
+      tag: "v0.2.2"
+    metrics:
+      serviceMonitor: true
+
+  fluentbit:
+    image:
+      repository: "iad.ocir.io/dataservicedev1/fluent/fluent-bit"
+      tag: "1.3.2"
+    metrics:
+      serviceMonitor: true
+    # In an OKE deployment, logs in:
+    # /var/log/containers/ (volume mounted here:
+    #    https://github.com/banzaicloud/logging-operator/blob/master/pkg/resources/fluentbit/daemonset.go#L121
+    # symlink to: /var/log/pods
+    # which then symlink to: /u01/data/docker/containers
+    extraVolumeMounts:
+      - source: /u01/data/docker/containers
+        destination: /u01/data/docker/containers
+        readOnly: true

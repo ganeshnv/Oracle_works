@@ -1,0 +1,9 @@
+lumberjack:
+  compartment: "ocid1.compartment.oc1..aaaaaaaad3o2bvlhnwswbkombbvxmlry32ynd7u2zy7wp5c37qlfwdsghj2q"
+  namespace: "cwd-production"
+
+logging-common-base:
+  fluentbit:
+    resources:
+      limits:
+        cpu: 1000m

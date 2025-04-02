@@ -1,0 +1,4 @@
+{{- if .Values.observer.enabled }}
+{{ include "observer.grafana-dashboards" . }}
+{{ include "observer.prometheus-rules" . }}
+{{- end }}

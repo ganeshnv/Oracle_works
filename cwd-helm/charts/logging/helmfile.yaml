@@ -1,0 +1,6 @@
+helmfiles:
+  - path: helmfile-logging-operator.yaml
+  - path: helmfile-logging-common.yaml
+
+environments:
+  {{ .Environment.Name }}: {}

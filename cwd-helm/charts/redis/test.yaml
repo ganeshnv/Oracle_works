@@ -1,0 +1,724 @@
+---
+# Source: redis/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redis-cluster
+  namespace: "cwd-apps"
+  labels:
+    app: redis
+    chart: redis-11.2.3
+    release: "redis-cluster"
+    heritage: "Helm"
+type: Opaque
+data:
+  redis-password: "U2hZOVNQcE9oZDBRT2NWYUtrUEdLUT09"
+---
+# Source: redis/templates/configmap-scripts.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-cluster-scripts
+  namespace: "cwd-apps"
+  labels:
+    app: redis
+    chart: redis-11.2.3
+    heritage: Helm
+    release: redis-cluster
+data:
+  start-node.sh: |
+    #!/bin/bash
+    is_boolean_yes() {
+        local -r bool="${1:-}"
+        # comparison is performed without regard to the case of alphabetic characters
+        shopt -s nocasematch
+        if [[ "$bool" = 1 || "$bool" =~ ^(yes|true)$ ]]; then
+            true
+        else
+            false
+        fi
+    }
+
+    export REDIS_REPLICATION_MODE="slave"
+    if [[ $HOSTNAME =~ (.*)-([0-9]+)$ ]]; then
+      if [[ ${BASH_REMATCH[2]} == "0" ]]; then
+        if [[ ! -f /data/redisboot.lock ]]; then
+          export REDIS_REPLICATION_MODE="master"
+        else
+          if is_boolean_yes "$REDIS_TLS_ENABLED"; then
+            sentinel_info_command="redis-cli -a $REDIS_PASSWORD -h redis-cluster-headless.cwd-apps.svc.cluster.local -p 26379 --tls --cert ${REDIS_TLS_CERT_FILE} --key ${REDIS_TLS_KEY_FILE} --cacert ${REDIS_TLS_CA_FILE} info"
+          else
+            sentinel_info_command="redis-cli -a $REDIS_PASSWORD -h redis-cluster-headless.cwd-apps.svc.cluster.local -p 26379 info"
+          fi
+          if [[ ! ($($sentinel_info_command)) ]]; then
+             export REDIS_REPLICATION_MODE="master"
+             rm /data/redisboot.lock
+          fi
+        fi
+      fi
+    fi
+
+    pod_index=($(echo "$POD_NAME" | tr "-" "\n"))
+    pod_index="${pod_index[-1]}"
+    ips=($(echo "[10.0.20.5 10.0.20.85 10.0.20.240]" | cut -d [ -f2 | cut -d ] -f 1))
+    export REDIS_CLUSTER_ANNOUNCE_IP="${ips[$pod_index]}"
+    export REDIS_NODES="${ips[@]}"
+    export REDIS_MASTER_HOST="${ips[0]}"
+    useradd redis
+    chown -R redis /data
+
+    if [[ -n $REDIS_PASSWORD_FILE ]]; then
+      password_aux=`cat ${REDIS_PASSWORD_FILE}`
+      export REDIS_PASSWORD=$password_aux
+    fi
+
+    if [[ -n $REDIS_MASTER_PASSWORD_FILE ]]; then
+      password_aux=`cat ${REDIS_MASTER_PASSWORD_FILE}`
+      export REDIS_MASTER_PASSWORD=$password_aux
+    fi
+
+    if [[ "$REDIS_REPLICATION_MODE" == "master" ]]; then
+      echo "I am master"
+      if [[ ! -f /opt/bitnami/redis/etc/master.conf ]];then
+        cp /opt/bitnami/redis/mounted-etc/master.conf /opt/bitnami/redis/etc/master.conf
+        echo "" >> /opt/bitnami/redis/etc/master.conf
+        echo "replica-announce-ip $REDIS_CLUSTER_ANNOUNCE_IP" >> /opt/bitnami/redis/etc/master.conf
+        export REDIS_MASTER_HOST=$REDIS_CLUSTER_ANNOUNCE_IP
+      fi
+    else
+      if [[ ! -f /opt/bitnami/redis/etc/replica.conf ]];then
+        cp /opt/bitnami/redis/mounted-etc/replica.conf /opt/bitnami/redis/etc/replica.conf
+        echo "" >> /opt/bitnami/redis/etc/replica.conf
+        echo "replica-announce-ip $REDIS_CLUSTER_ANNOUNCE_IP" >> /opt/bitnami/redis/etc/replica.conf
+      fi
+
+      if is_boolean_yes "$REDIS_TLS_ENABLED"; then
+        sentinel_info_command="redis-cli -a $REDIS_PASSWORD -h redis-cluster-headless.cwd-apps.svc.cluster.local -p 26379 --tls --cert ${REDIS_TLS_CERT_FILE} --key ${REDIS_TLS_KEY_FILE} --cacert ${REDIS_TLS_CA_FILE} sentinel get-master-addr-by-name mymaster"
+      else
+        sentinel_info_command="redis-cli -a $REDIS_PASSWORD -h redis-cluster-headless.cwd-apps.svc.cluster.local -p 26379 sentinel get-master-addr-by-name mymaster"
+      fi
+      REDIS_SENTINEL_INFO=($($sentinel_info_command))
+      #REDIS_MASTER_HOST=${REDIS_SENTINEL_INFO[0]}
+      REDIS_MASTER_PORT_NUMBER=${REDIS_SENTINEL_INFO[1]}
+    fi
+
+    if [[ ! -f /opt/bitnami/redis/etc/redis.conf ]];then
+      cp /opt/bitnami/redis/mounted-etc/redis.conf /opt/bitnami/redis/etc/redis.conf
+    fi
+    ARGS=("--port" "${REDIS_PORT}")
+
+    if [[ "$REDIS_REPLICATION_MODE" == "slave" ]]; then
+      ARGS+=("--slaveof" "${REDIS_MASTER_HOST}" "${REDIS_MASTER_PORT_NUMBER}")
+    fi
+    ARGS+=("--requirepass" "${REDIS_PASSWORD}")
+    ARGS+=("--masterauth" "${REDIS_MASTER_PASSWORD}")
+
+    if [[ "$REDIS_REPLICATION_MODE" == "master" ]]; then
+      ARGS+=("--include" "/opt/bitnami/redis/etc/master.conf")
+    else
+      ARGS+=("--include" "/opt/bitnami/redis/etc/replica.conf")
+    fi
+
+    ARGS+=("--include" "/opt/bitnami/redis/etc/redis.conf")
+
+    touch /data/redisboot.lock
+    exec /run.sh "${ARGS[@]}"
+
+  start-sentinel.sh: |
+    #!/bin/bash
+    replace_in_file() {
+        local filename="${1:?filename is required}"
+        local match_regex="${2:?match regex is required}"
+        local substitute_regex="${3:?substitute regex is required}"
+        local posix_regex=${4:-true}
+
+        local result
+
+        # We should avoid using 'sed in-place' substitutions
+        # 1) They are not compatible with files mounted from ConfigMap(s)
+        # 2) We found incompatibility issues with Debian10 and "in-place" substitutions
+        del=$'\001' # Use a non-printable character as a 'sed' delimiter to avoid issues
+        if [[ $posix_regex = true ]]; then
+            result="$(sed -E "s${del}${match_regex}${del}${substitute_regex}${del}g" "$filename")"
+        else
+            result="$(sed "s${del}${match_regex}${del}${substitute_regex}${del}g" "$filename")"
+        fi
+        echo "$result" > "$filename"
+    }
+    sentinel_conf_set() {
+        local -r key="${1:?missing key}"
+        local value="${2:-}"
+
+        # Sanitize inputs
+        value="${value//\\/\\\\}"
+        value="${value//&/\\&}"
+        value="${value//\?/\\?}"
+        [[ "$value" = "" ]] && value="\"$value\""
+
+        replace_in_file "/opt/bitnami/redis-sentinel/etc/sentinel.conf" "^#*\s*${key} .*" "${key} ${value}" false
+    }
+    is_boolean_yes() {
+        local -r bool="${1:-}"
+        # comparison is performed without regard to the case of alphabetic characters
+        shopt -s nocasematch
+        if [[ "$bool" = 1 || "$bool" =~ ^(yes|true)$ ]]; then
+            true
+        else
+            false
+        fi
+    }
+
+    if [[ -n $REDIS_PASSWORD_FILE ]]; then
+      password_aux=`cat ${REDIS_PASSWORD_FILE}`
+      export REDIS_PASSWORD=$password_aux
+    fi
+
+    if [[ ! -f /opt/bitnami/redis-sentinel/etc/sentinel.conf ]]; then
+      cp /opt/bitnami/redis-sentinel/mounted-etc/sentinel.conf /opt/bitnami/redis-sentinel/etc/sentinel.conf
+      printf "\nsentinel auth-pass mymaster $REDIS_PASSWORD" >> /opt/bitnami/redis-sentinel/etc/sentinel.conf
+      printf "\nrequirepass $REDIS_PASSWORD" >> /opt/bitnami/redis-sentinel/etc/sentinel.conf
+    fi
+
+    pod_index=($(echo "$POD_NAME" | tr "-" "\n"))
+    pod_index="${pod_index[-1]}"
+    ips=($(echo "[10.0.20.5 10.0.20.85 10.0.20.240]" | cut -d [ -f2 | cut -d ] -f 1))
+    export REDIS_CLUSTER_ANNOUNCE_IP="${ips[$pod_index]}"
+    export REDIS_NODES="${ips[@]}"
+    export REDIS_MASTER_HOST="${ips[0]}"
+
+    export REDIS_REPLICATION_MODE="slave"
+    if [[ $HOSTNAME =~ (.*)-([0-9]+)$ ]]; then
+      if [[ ${BASH_REMATCH[2]} == "0" ]]; then
+        if [[ ! -f /data/sentinelboot.lock ]]; then
+          export REDIS_REPLICATION_MODE="master"
+        else
+          if is_boolean_yes "$REDIS_SENTINEL_TLS_ENABLED"; then
+            sentinel_info_command="redis-cli -a $REDIS_PASSWORD -h redis-cluster-headless.cwd-apps.svc.cluster.local -p 26379 --tls --cert ${REDIS_SENTINEL_TLS_CERT_FILE} --key ${REDIS_SENTINEL_TLS_KEY_FILE} --cacert ${REDIS_SENTINEL_TLS_CA_FILE} info"
+          else
+            sentinel_info_command="redis-cli -a $REDIS_PASSWORD -h redis-cluster-headless.cwd-apps.svc.cluster.local -p 26379 info"
+          fi
+          if [[ ! ($($sentinel_info_command)) ]]; then
+             export REDIS_REPLICATION_MODE="master"
+             rm /data/sentinelboot.lock
+          fi
+        fi
+      fi
+    fi
+
+    if [[ "$REDIS_REPLICATION_MODE" == "master" ]]; then
+      #sentinel_conf_set "sentinel monitor" "mymaster redis-cluster-node-0.redis-cluster-headless.cwd-apps.svc.cluster.local 6379 2"
+      sentinel_conf_set "sentinel monitor" "mymaster $REDIS_MASTER_HOST 6379 2"
+    else
+      if is_boolean_yes "$REDIS_SENTINEL_TLS_ENABLED"; then
+        sentinel_info_command="redis-cli -a $REDIS_PASSWORD -h redis-cluster-headless.cwd-apps.svc.cluster.local -p 26379 --tls --cert ${REDIS_SENTINEL_TLS_CERT_FILE} --key ${REDIS_SENTINEL_TLS_KEY_FILE} --cacert ${REDIS_SENTINEL_TLS_CA_FILE} sentinel get-master-addr-by-name mymaster"
+      else
+        sentinel_info_command="redis-cli -a $REDIS_PASSWORD -h redis-cluster-headless.cwd-apps.svc.cluster.local -p 26379 sentinel get-master-addr-by-name mymaster"
+      fi
+      REDIS_SENTINEL_INFO=($($sentinel_info_command))
+      #REDIS_MASTER_HOST=${REDIS_SENTINEL_INFO[0]}
+      REDIS_MASTER_PORT_NUMBER=${REDIS_SENTINEL_INFO[1]}
+
+      sentinel_conf_set "sentinel monitor" "mymaster "$REDIS_MASTER_HOST" "$REDIS_MASTER_PORT_NUMBER" 2"
+    fi
+    touch /data/sentinelboot.lock
+    exec redis-server /opt/bitnami/redis-sentinel/etc/sentinel.conf --sentinel
+---
+# Source: redis/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-cluster
+  namespace: "cwd-apps"
+  labels:
+    app: redis
+    chart: redis-11.2.3
+    heritage: Helm
+    release: redis-cluster
+data:
+  redis.conf: |-
+    # User-supplied configuration:
+    # Enable AOF https://redis.io/topics/persistence#append-only-file
+    appendonly yes
+    # Disable RDB persistence, AOF persistence already enabled.
+    save ""
+  master.conf: |-
+    dir /data
+    rename-command FLUSHDB ""
+    rename-command FLUSHALL ""
+  replica.conf: |-
+    dir /data
+    slave-read-only no
+    rename-command FLUSHDB ""
+    rename-command FLUSHALL ""
+  sentinel.conf: |-
+    dir "/tmp"
+    bind 0.0.0.0
+    port 26379
+    sentinel monitor mymaster redis-cluster-master-0.redis-cluster-headless.cwd-apps.svc.cluster.local 6379 2
+    sentinel down-after-milliseconds mymaster 60000
+    sentinel failover-timeout mymaster 18000
+    sentinel parallel-syncs mymaster 1
+---
+# Source: redis/templates/health-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-cluster-health
+  namespace: "cwd-apps"
+  labels:
+    app: redis
+    chart: redis-11.2.3
+    heritage: Helm
+    release: redis-cluster
+data:
+  ping_readiness_local.sh: |-
+    #!/bin/bash
+    no_auth_warning=$([[ "$(redis-cli --version)" =~ (redis-cli 5.*) ]] && echo --no-auth-warning)
+    response=$(
+      timeout -s 3 $1 \
+      redis-cli \
+        -a $REDIS_PASSWORD $no_auth_warning \
+        -h localhost \
+        -p $REDIS_PORT \
+        ping
+    )
+    if [ "$response" != "PONG" ]; then
+      echo "$response"
+      exit 1
+    fi
+  ping_liveness_local.sh: |-
+    #!/bin/bash
+    no_auth_warning=$([[ "$(redis-cli --version)" =~ (redis-cli 5.*) ]] && echo --no-auth-warning)
+    response=$(
+      timeout -s 3 $1 \
+      redis-cli \
+        -a $REDIS_PASSWORD $no_auth_warning \
+        -h localhost \
+        -p $REDIS_PORT \
+        ping
+    )
+    if [ "$response" != "PONG" ] && [ "$response" != "LOADING Redis is loading the dataset in memory" ]; then
+      echo "$response"
+      exit 1
+    fi
+  ping_sentinel.sh: |-
+    #!/bin/bash
+    no_auth_warning=$([[ "$(redis-cli --version)" =~ (redis-cli 5.*) ]] && echo --no-auth-warning)
+     response=$(
+      timeout -s 3 $1 \
+      redis-cli \
+        -a $REDIS_PASSWORD $no_auth_warning \
+        -h localhost \
+        -p $REDIS_SENTINEL_PORT \
+        ping
+    )
+    if [ "$response" != "PONG" ]; then
+      echo "$response"
+      exit 1
+    fi
+  parse_sentinels.awk: |-
+    /ip/ {FOUND_IP=1}
+    /port/ {FOUND_PORT=1}
+    /runid/ {FOUND_RUNID=1}
+    !/ip|port|runid/ {
+      if (FOUND_IP==1) {
+        IP=$1; FOUND_IP=0;
+      }
+      else if (FOUND_PORT==1) {
+        PORT=$1;
+        FOUND_PORT=0;
+      } else if (FOUND_RUNID==1) {
+        printf "\nsentinel known-sentinel mymaster %s %s %s", IP, PORT, $0; FOUND_RUNID=0;
+      }
+    }
+  ping_readiness_master.sh: |-
+    #!/bin/bash
+    no_auth_warning=$([[ "$(redis-cli --version)" =~ (redis-cli 5.*) ]] && echo --no-auth-warning)
+     response=$(
+      timeout -s 3 $1 \
+      redis-cli \
+        -a $REDIS_MASTER_PASSWORD $no_auth_warning \
+        -h $REDIS_MASTER_HOST \
+        -p $REDIS_MASTER_PORT_NUMBER \
+        ping
+    )
+    if [ "$response" != "PONG" ]; then
+      echo "$response"
+      exit 1
+    fi
+  ping_liveness_master.sh: |-
+    #!/bin/bash
+    no_auth_warning=$([[ "$(redis-cli --version)" =~ (redis-cli 5.*) ]] && echo --no-auth-warning)
+    response=$(
+      timeout -s 3 $1 \
+      redis-cli \
+        -a $REDIS_MASTER_PASSWORD $no_auth_warning \
+        -h $REDIS_MASTER_HOST \
+        -p $REDIS_MASTER_PORT_NUMBER \
+        ping
+    )
+    if [ "$response" != "PONG" ] && [ "$response" != "LOADING Redis is loading the dataset in memory" ]; then
+      echo "$response"
+      exit 1
+    fi
+  ping_readiness_local_and_master.sh: |-
+    script_dir="$(dirname "$0")"
+    exit_status=0
+    "$script_dir/ping_readiness_local.sh" $1 || exit_status=$?
+    "$script_dir/ping_readiness_master.sh" $1 || exit_status=$?
+    exit $exit_status
+  ping_liveness_local_and_master.sh: |-
+    script_dir="$(dirname "$0")"
+    exit_status=0
+    "$script_dir/ping_liveness_local.sh" $1 || exit_status=$?
+    "$script_dir/ping_liveness_master.sh" $1 || exit_status=$?
+    exit $exit_status
+---
+# Source: redis/templates/headless-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cluster-headless
+  namespace: "cwd-apps"
+  labels:
+    app: redis
+    chart: redis-11.2.3
+    release: redis-cluster
+    heritage: Helm
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: redis
+    - name: redis-sentinel
+      port: 26379
+      targetPort: redis-sentinel
+  selector:
+    app: redis
+    release: redis-cluster
+---
+# Source: redis/templates/redis-with-sentinel-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cluster
+  namespace: "cwd-apps"
+  labels:
+    app: redis
+    chart: redis-11.2.3
+    release: redis-cluster
+    heritage: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: redis
+    - name: redis-sentinel
+      port: 26379
+      targetPort: redis-sentinel
+  selector:
+    app: redis
+    release: redis-cluster
+---
+# Source: redis/templates/svc-cluster-external-access.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cluster-0-svc
+  labels:
+    release: redis-cluster
+    pod: redis-cluster-node-0
+  annotations:
+    service.beta.kubernetes.io/oci-load-balancer-internal: "true"
+    service.beta.kubernetes.io/oci-load-balancer-security-list-management-mode: None
+spec:
+  type: LoadBalancer
+
+
+
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: redis
+    - name: redis-bus
+      targetPort: redis-bus
+      port: 16379
+    - name: redis-sentinel
+      port: 26379
+      targetPort: redis-sentinel
+  selector:
+    release: redis-cluster
+    statefulset.kubernetes.io/pod-name: redis-cluster-node-0
+---
+# Source: redis/templates/svc-cluster-external-access.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cluster-1-svc
+  labels:
+    release: redis-cluster
+    pod: redis-cluster-node-1
+  annotations:
+    service.beta.kubernetes.io/oci-load-balancer-internal: "true"
+    service.beta.kubernetes.io/oci-load-balancer-security-list-management-mode: None
+spec:
+  type: LoadBalancer
+
+
+
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: redis
+    - name: redis-bus
+      targetPort: redis-bus
+      port: 16379
+    - name: redis-sentinel
+      port: 26379
+      targetPort: redis-sentinel
+  selector:
+    release: redis-cluster
+    statefulset.kubernetes.io/pod-name: redis-cluster-node-1
+---
+# Source: redis/templates/svc-cluster-external-access.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cluster-2-svc
+  labels:
+    release: redis-cluster
+    pod: redis-cluster-node-2
+  annotations:
+    service.beta.kubernetes.io/oci-load-balancer-internal: "true"
+    service.beta.kubernetes.io/oci-load-balancer-security-list-management-mode: None
+spec:
+  type: LoadBalancer
+
+
+
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: redis
+    - name: redis-bus
+      targetPort: redis-bus
+      port: 16379
+    - name: redis-sentinel
+      port: 26379
+      targetPort: redis-sentinel
+  selector:
+    release: redis-cluster
+    statefulset.kubernetes.io/pod-name: redis-cluster-node-2
+---
+# Source: redis/templates/redis-node-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-cluster-node
+  namespace: "cwd-apps"
+  labels:
+    app: redis
+    chart: redis-11.2.3
+    release: redis-cluster
+    heritage: Helm
+spec:
+  replicas: 3
+  serviceName: redis-cluster-headless
+  selector:
+    matchLabels:
+      app: redis
+      release: redis-cluster
+      role: node
+  template:
+    metadata:
+      labels:
+        app: redis
+        release: redis-cluster
+        chart: redis-11.2.3
+        role: node
+      annotations:
+        checksum/health: 5e47d9594b0df4819d80545db015f28df6d72bbc62d8cd96000ad53ae13aa1ea
+        checksum/configmap: 43579e8a979e99a742162ddba42dcb3836130f90f24e49463b9797f4a01a3d5d
+        checksum/secret: dd32681147b59bf74a248eaf4a2b600d7b4b10f0f89baa5d81d9652bf91f88c4
+    spec:
+      
+      imagePullSecrets:
+        - name: ocirsecret
+      securityContext:
+        fsGroup: 1001
+      serviceAccountName: default
+      containers:
+        - name: redis
+          image: iad.ocir.io/cwdinfradev/infra/redis:6.0.8
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            runAsUser: 1001
+          command:
+            - /bin/bash
+            - -c
+            - /opt/bitnami/scripts/start-scripts/start-node.sh
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: REDIS_MASTER_PORT_NUMBER
+              value: "6379"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-cluster
+                  key: redis-password
+            - name: REDIS_MASTER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-cluster
+                  key: redis-password
+            - name: REDIS_TLS_ENABLED
+              value: "no"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DATA_DIR
+              value: /data
+          ports:
+            - name: redis
+              containerPort: 6379
+            - name: redis-bus
+              containerPort: 16379
+          livenessProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 5
+            exec:
+              command:
+                - sh
+                - -c
+                - /health/ping_liveness_local.sh 5
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 5
+            exec:
+              command:
+                - sh
+                - -c
+                - /health/ping_readiness_local.sh 5
+          resources:
+            null
+          volumeMounts:
+            - name: start-scripts
+              mountPath: /opt/bitnami/scripts/start-scripts
+            - name: health
+              mountPath: /health
+            - name: redis-data
+              mountPath: /data
+            - name: config
+              mountPath: /opt/bitnami/redis/mounted-etc
+            - name: redis-tmp-conf
+              mountPath: /opt/bitnami/redis/etc
+        - name: sentinel
+          image: iad.ocir.io/cwdinfradev/infra/redis-sentinel:6.0.8
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            runAsUser: 1001
+          command:
+            - /bin/bash
+            - -c
+            - /opt/bitnami/scripts/start-scripts/start-sentinel.sh
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-cluster
+                  key: redis-password
+            - name: REDIS_SENTINEL_TLS_ENABLED
+              value: "no"
+            - name: REDIS_SENTINEL_PORT
+              value: "26379"
+          ports:
+            - name: redis-sentinel
+              containerPort: 26379
+          livenessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 5
+            exec:
+              command:
+                - sh
+                - -c
+                - /health/ping_sentinel.sh 5
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 5
+            exec:
+              command:
+                - sh
+                - -c
+                - /health/ping_sentinel.sh 5
+          resources:
+            null
+          volumeMounts:
+            - name: start-scripts
+              mountPath: /opt/bitnami/scripts/start-scripts
+            - name: health
+              mountPath: /health
+            - name: redis-data
+              mountPath: /data
+              subPath: 
+            - name: config
+              mountPath: /opt/bitnami/redis-sentinel/mounted-etc
+            - name: sentinel-tmp-conf
+              mountPath: /opt/bitnami/redis-sentinel/etc
+      volumes:
+        - name: start-scripts
+          configMap:
+            name: redis-cluster-scripts
+            defaultMode: 0755
+        - name: health
+          configMap:
+            name: redis-cluster-health
+            defaultMode: 0755
+        - name: config
+          configMap:
+            name: redis-cluster
+        - name: sentinel-tmp-conf
+          emptyDir: {}
+        - name: redis-tmp-conf
+          emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+        labels:
+          app: redis
+          release: redis-cluster
+          heritage: Helm
+          component: slave
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "8Gi"
+        
+        selector:
+  updateStrategy:
+    type: RollingUpdate
+

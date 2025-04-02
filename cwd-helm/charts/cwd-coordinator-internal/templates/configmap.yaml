@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cwd-coordinator-internal.fullname" . }}-wfaas-config
+  labels:
+    {{- include "cwd-coordinator-internal.labels" . | nindent 4 }}
+data:
+  OCI_AD: {{ .Values.workflow.ociAd }}
+  OCI_IAAS_DOMAIN_NAME: {{ .Values.workflow.ociIaasDomainName }}
+  WORKFLOW_DOMAIN_ID: {{ .Values.workflow.domainId }}
+  CONFIG_FILE: {{ .Values.workflow.configFile | default "target/config/cwd/deployment.conf" | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cwd-coordinator-internal.fullname" . }}-tpaas-config
+  labels:
+    {{- include "cwd-coordinator-internal.labels" . | nindent 4 }}
+data:
+  TPAAS_SERVER_ENDPOINT: {{ .Values.tpaas.server | quote }}
+  TPAAS_REPORT_SERVER_ENDPOINT: {{ .Values.tpaas.reportServer | quote }}
+  TPAAS_USERNAME: {{ .Values.tpaas.username | default "" | quote }}
+  TPAAS_PASSWORD: {{ .Values.tpaas.password | default "" | quote }}
+  TPAAS_AUTH_TOKEN: {{ .Values.tpaas.authToken | default "" | quote }}
+  TPAAS_POST_API_VERSION: {{ .Values.tpaas.postVersion | default "v3" | quote }}
+  TPAAS_GET_API_VERSION: {{ .Values.tpaas.getVersion | default "v1" | quote }}
+  TPAAS_OVERVIEW_SERVICE_USER_TAGS: {{ .Values.tpaas.overviewServiceTags | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cwd-coordinator-internal.fullname" . }}-cwddb-config
+  labels:
+    {{- include "cwd-coordinator-internal.labels" . | nindent 4 }}
+data:
+  WALLET_LOCATION: {{ .Values.cwdDb.walletMountLocation | default "/etc/dbwallet" | quote }}
+  ATP_DB_USERNAME: {{ .Values.cwdDb.username | default "watchdog" | quote }}
+  CWD_DB_OCID: {{ .Values.cwdDb.dbOcid | default "" | quote }}
+  ATP_DB_SERVICE: {{ .Values.cwdDb.serviceName | quote }}
+
+
+
+

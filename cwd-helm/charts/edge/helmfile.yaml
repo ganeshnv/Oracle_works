@@ -1,0 +1,20 @@
+
+helmDefaults:
+  wait: false
+  timeout: 600
+  force: false
+  recreatePods: false
+
+repositories: []
+#  - name: cwd-helm
+#    url: https://artifactory.oci.oraclecorp.com:443/cwd-dev-helm-virtual
+
+environments:
+  {{ .Environment.Name }}: {}
+
+releases:
+  - name: edge
+    namespace: system
+    chart: .
+    values:
+      - ../../environments/{{ .Environment.Name }}/edge.yaml

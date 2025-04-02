@@ -1,0 +1,56 @@
+# Default values for cwd-coordinator.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: iad.ocir.io/cwdinfradev/cwd/cwd-coordinator
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart version.
+  tag: "0.2.55-SNAPSHOT"
+
+imagePullSecrets:
+  - name: ocirsecret
+nameOverride: ""
+fullnameOverride: ""
+
+podExtraAnnotations:
+  vault.security.banzaicloud.io/vault-role: "cwd-staging_apps_cloudwatchdog"
+
+podExtraLabels:
+  common-logging-flow: enabled
+
+workflow:
+  overlayMode: false
+  locationOverride:
+    region: "IAD"
+    availabilityDomain: "IAD_AD_1"
+  ociAd: "ad1"
+  ociIaasDomainName: "us-ashburn-1.oracleiaas.com"
+  domainId: "cwdwf"
+
+cwdDb:
+  username: watchdog
+  password: Welcome_1234_1234
+  walletMountLocation: /etc/runit/artifacts/cwd-coordinator/wallet
+  dbOcid: "ocid1.autonomousdatabase.oc1.iad.abuwcljrrgtfgsqwbvglndukzo75kdx2ufqvgkqa3ll35v77xvs7hxfm52wa"
+  serviceName: "cwd_medium"
+
+tpaas:
+  server: http://tpaas-server-api:19000
+  reportServer: http://tpaas-server-report-server:18081
+  #authToken: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbm5pLmd1b0BvcmFjbGUuY29tIiwiaWF0IjoxNjg2ODczNjAwfQ.TJjJCRDduu-sIa_OZ2oXJeChzgt0S3gluT3cHkDh8NUgK2Syj5Xs4ijUYp46myeVJEeFZRaRfIUuSZT1IA9sJw
+  authToken: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnYW5lc2gudi52YWRpdmVsQG9yYWNsZS5jb20iLCJpYXQiOjE2OTEwNDA3OTN9.q0tW4iBb4_k65WZWPFiErrUDa4m6UIaTN24a7gJ5gyT446CnStPKi7dwIfvQl2EVq955dg7w5Gb_KPGkSX9WoQ
+  postVersion: "v3"
+  getVersion: "v1"
+  overviewServiceTags: "smoketest,smoketest(oci),vpnaaslifecycle,compapihealth,complaunchhealth"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""

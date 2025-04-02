@@ -1,0 +1,8 @@
+dependencies:
+  - name: logging-operator-logging
+    alias: logging-common-base
+    version: 2.7.2
+#    url: git+https://github.com/banzaicloud/logging-operator@charts/logging-operator-logging?ref=master
+#    repository: https://artifactory.oci.oraclecorp.com:443/cwd-dev-helm-virtual
+    repository: file://../../../charts/cwd-dev-helm-virtual/logging-operator-logging/logging-operator-logging
+    condition: logging-common-base.enabled

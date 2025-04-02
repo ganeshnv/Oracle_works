@@ -1,0 +1,14 @@
+grafanaDashboardUrls: {}
+
+# Because we have to do this all as template files from uber charts,
+# we have to put all this in the tpl file itself.
+#observer:
+#  prometheusRulesFilePattern: "*.rules"
+#  prometheusDirectory: observer
+#  grafanaDashboardFilePattern: "*.json"
+#  grafanaDirectory: observer
+#  grafanaDashboardUrls: {"dashboardName": "dashboardUrl"}
+#  grafanaDashboardLabels:
+#    grafana_dashboard: "1"
+observer:
+  enabled: false

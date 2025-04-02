@@ -1,0 +1,4 @@
+CWD Coordinator deployed:
+WFaaS endpoint: https://{{ .Values.workflow.domainId }}.wfaas-overlay.{{ .Values.workflow.ociAd }}.{{ .Values.workflow.ociIaasDomainName}}
+TPaaS endpoint: {{ .Values.tpaas.server }}
+CWD APEX DB: {{ .Values.cwdDb.username }}

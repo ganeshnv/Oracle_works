@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cwd-coordinator.fullname" . }}
+  labels:
+    {{- include "cwd-coordinator.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "cwd-coordinator.selectorLabels" . | nindent 6 }}
+  revisionHistoryLimit: 3
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.podExtraAnnotations }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+      labels:
+        {{- include "cwd-coordinator.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podExtraLabels }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "cwd-coordinator.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "cwd-coordinator.fullname" . }}-wfaas-config
+            - configMapRef:
+                name: {{ include "cwd-coordinator.fullname" . }}-cwddb-config
+            - configMapRef:
+                name: {{ include "cwd-coordinator.fullname" . }}-tpaas-config
+          env:
+            - name: ATP_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: {{ include "cwd-coordinator.fullname" . }}-cwddb-secret
+            - name: ATP_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: {{ include "cwd-coordinator.fullname" . }}-cwddb-secret
+          ports:
+            - name: api
+              containerPort: 19000
+              protocol: TCP
+            - name: admin
+              containerPort: 19002
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: admin
+          readinessProbe:
+            initialDelaySeconds: 10
+            httpGet:
+              path: /healthcheck
+              port: admin
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,69 @@
+# Source: oauth2-proxy/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: cwd-apps
+  name: oauth2-proxy-cwd-internal
+  labels:
+    app.kubernetes.io/component: oauth2-proxy-cwd-internal
+    helm.sh/chart: oauth2-proxy-1
+    app.kubernetes.io/name: oauth2-proxy
+    app.kubernetes.io/instance: oauth2-proxy
+    app.kubernetes.io/version: "1.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "portal-internal.ocws.us-ashburn-1.oci.oraclecloud.com"
+      secretName: oauth2-proxy-cwd-internal
+  rules:
+    - host: portal-internal.ocws.us-ashburn-1.oci.oraclecloud.com
+      http:
+        paths:
+          - path: /(.+)
+            pathType: Prefix
+            backend:
+              service:
+                name: oauth2-proxy-cwd-internal
+                port:
+                  number: 4180
+---
+# Source: oauth2-proxy/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: cwd-apps
+  name: oauth2-proxy-cwd-internal-root
+  labels:
+    app.kubernetes.io/component: oauth2-proxy-cwd-internal
+    helm.sh/chart: oauth2-proxy-1
+    app.kubernetes.io/name: oauth2-proxy
+    app.kubernetes.io/instance: oauth2-proxy
+    app.kubernetes.io/version: "1.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/rewrite-target: /ords/r/watchdog/liftandshift/submit-jobs
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "portal-internal.ocws.us-ashburn-1.oci.oraclecloud.com"
+      secretName: oauth2-proxy-cwd-internal
+  rules:
+    - host: portal-internal.ocws.us-ashburn-1.oci.oraclecloud.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: oauth2-proxy-cwd-internal
+                port:
+                  number: 4180

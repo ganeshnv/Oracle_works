@@ -1,0 +1,51 @@
+groups:
+  - name: cwd_coordinator_prometheus
+    rules:
+      - alert: TooManyQueueJobs
+        expr: sum(cwd_coordinator_queued_requests) > 50
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Number of jobs in queue large than 50"
+          description: "Too many number of jobs in queue in 30 mins"
+      - alert: NoMoreQueuedJobs
+        expr: sum(increase(cwd_coordinator_queued_requests[30m])) == 0
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Number of jobs in queue keeps 0"
+          description: "No more jobs increase in queue in 30 mins"
+      - alert: WorkflowLauchFailed
+        expr: sum(cwd_coordinator_workflow_launch_failure_total{}) - sum(cwd_coordinator_workflow_launch_failure_total{} offset 6h) > 0
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Number of workflow launch failure large than 0"
+          description: "There are number of workflow launch failure in 30 mins"
+      - alert: CoordinatorValidationFailure
+        expr: cwd_coordinator_validation_failure_total > 0
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Coordinator validation error > 0"
+          description: "There is coordinator validation error in 30 mins"
+      - alert: WorkFloweScanIncrease
+        expr: sum(increase(cwd_coordinator_nanny_scan_total[30m])) < 80
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "new workflow scan in 30 min < 80"
+          description: "New workflow scan less than 80 in 30 minutes"
+      - alert: WorkFlowFailedTotal
+        expr: sum by (service_id) (increase(cwd_coordinator_workflow_failed_total[5m])) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Workflow failed number happen "
+          description: "New workflow failed happen in 5 minutes"

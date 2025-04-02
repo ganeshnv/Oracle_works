@@ -1,0 +1,389 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "oauth2-proxy-tpaas-ui-name" . }}
+  labels:
+    {{- include "oauth2-proxy-tpaas-ui.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.portal.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "oauth2-proxy-tpaas-ui.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "oauth2-proxy-tpaas-ui.labels" . | nindent 8 }}
+        {{- with .Values.extraLabels }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "oauth2-proxy-tpaas-ui-name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --provider={{ .Values.portal.config.provider }}
+            - --email-domain={{ .Values.portal.config.emailDomain }}
+            - --upstream={{ .Values.portal.config.upstream }}
+            - --scope={{ .Values.portal.config.scope }}
+            - --client-id={{ .Values.portal.config.clientId }}
+            - --redirect-url={{ .Values.portal.config.redirectUrl }}
+            - --http-address={{ .Values.portal.config.httpAddress }}
+            - --cookie-secure={{ .Values.portal.config.cookieSecure }}
+            - --cookie-secret={{ .Values.portal.config.cookieSecret }}
+            - --pass-basic-auth=true
+            - --pass-user-headers=true
+            - --skip-provider-button=true
+            - --cookie-expire={{ .Values.api.config.cookieExpire }}
+          env:
+            - name: OAUTH2_PROXY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: {{ include "oauth2-proxy.fullname" . }}-client-secret
+          envFrom:
+            {{- include "liveness-probe"  (dict "api" .Values.portal.container.port) | indent 10 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "oauth2-proxy-tpaas-api-name" . }}
+  labels:
+    {{- include "oauth2-proxy-tpaas-api.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.api.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "oauth2-proxy-tpaas-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "oauth2-proxy-tpaas-api.labels" . | nindent 8 }}
+        {{- with .Values.extraLabels }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "oauth2-proxy-tpaas-api-name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --provider={{ .Values.api.config.provider }}
+            - --email-domain={{ .Values.api.config.emailDomain }}
+            - --upstream={{ .Values.api.config.upstream }}
+            - --scope={{ .Values.api.config.scope }}
+            - --client-id={{ .Values.api.config.clientId }}
+            - --redirect-url={{ .Values.api.config.redirectUrl }}
+            - --http-address={{ .Values.api.config.httpAddress }}
+            - --cookie-secure={{ .Values.api.config.cookieSecure }}
+            - --cookie-secret={{ .Values.api.config.cookieSecret }}
+            - --pass-basic-auth=true
+            - --pass-user-headers=true
+            - --skip-provider-button=true
+            - --cookie-expire={{ .Values.api.config.cookieExpire }}
+          env:
+            - name: OAUTH2_PROXY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: {{ include "oauth2-proxy.fullname" . }}-client-secret
+          envFrom:
+            {{- include "liveness-probe"  (dict "api" .Values.api.container.port) | indent 10 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "oauth2-proxy-cwd-name" . }}
+  labels:
+    {{- include "oauth2-proxy-cwd.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.cwd.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "oauth2-proxy-cwd.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "oauth2-proxy-cwd.labels" . | nindent 8 }}
+        {{- with .Values.extraLabels }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "oauth2-proxy-cwd-name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.ldapTag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --provider={{ .Values.cwd.config.provider }}
+            - --email-domain={{ .Values.cwd.config.emailDomain }}
+            - --upstream={{ include "oauth2-proxy-cwd-upstream" . }}
+            - --scope={{ .Values.cwd.config.scope }}
+            - --client-id={{ .Values.cwd.config.clientId }}
+            - --redirect-url={{ .Values.cwd.config.redirectUrl }}
+            - --http-address={{ .Values.cwd.config.httpAddress }}
+            - --cookie-secure={{ .Values.cwd.config.cookieSecure }}
+            - --cookie-secret={{ .Values.cwd.config.cookieSecret }}
+            - --pass-basic-auth=true
+            - --pass-user-headers=true
+            - --whitelist-domain={{.Values.cwd.config.whitelistDomains}}
+            - --skip-provider-button=true
+            - --cookie-expire={{ .Values.cwd.config.cookieExpire }}
+            - --profile-url={{ .Values.cwd.config.profileUrl }}
+          env:
+            - name: OAUTH2_PROXY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: {{ include "oauth2-proxy.fullname" . }}-client-secret
+          envFrom:
+            {{- include "liveness-probe"  (dict "api" .Values.cwd.container.port) | indent 10 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{include "oauth2-proxy-cwd-nginx-name" .}}
+  labels:
+    {{- include "oauth2-proxy-cwd-nginx.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.cwd.nginx.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "oauth2-proxy-cwd-nginx.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "oauth2-proxy-cwd-nginx.labels" . | nindent 8 }}
+        {{- with .Values.extraLabels }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "oauth2-proxy-cwd-nginx-name" . }}
+          image: "{{ .Values.cwd.nginx.image.repository }}:{{ .Values.cwd.nginx.image.tag }}"
+          imagePullPolicy: {{ .Values.cwd.nginx.image.pullPolicy }}
+          volumeMounts:
+            {{- include "volume-mount-cwd-nginx" . | nindent 10 }}
+          envFrom:
+            {{- include "liveness-probe"  (dict "api" .Values.cwd.nginx.container.port) | indent 10 }}
+      volumes:
+        {{- include "volume-cwd-nginx" . | nindent 6 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "oauth2-proxy-tpaas-report-server-name" . }}
+  labels:
+    {{- include "oauth2-proxy-tpaas-report-server.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.reportServer.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "oauth2-proxy-tpaas-report-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "oauth2-proxy-tpaas-report-server.labels" . | nindent 8 }}
+        {{- with .Values.extraLabels }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "oauth2-proxy-tpaas-report-server-name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --provider={{ .Values.reportServer.config.provider }}
+            - --email-domain={{ .Values.reportServer.config.emailDomain }}
+            - --upstream={{ .Values.reportServer.config.upstream }}
+            - --scope={{ .Values.reportServer.config.scope }}
+            - --client-id={{ .Values.reportServer.config.clientId }}
+            - --redirect-url={{ .Values.reportServer.config.redirectUrl }}
+            - --http-address={{ .Values.reportServer.config.httpAddress }}
+            - --cookie-secure={{ .Values.reportServer.config.cookieSecure }}
+            - --cookie-secret={{ .Values.reportServer.config.cookieSecret }}
+            - --pass-basic-auth=true
+            - --pass-user-headers=true
+            - --whitelist-domain={{.Values.reportServer.config.whitelistDomains}}
+            - --skip-provider-button=true
+            - --cookie-expire={{ .Values.reportServer.config.cookieExpire }}
+          env:
+            - name: OAUTH2_PROXY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: {{ include "oauth2-proxy.fullname" . }}-client-secret
+          envFrom:
+            {{- include "liveness-probe"  (dict "api" .Values.reportServer.container.port) | indent 10 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "oauth2-proxy-tpaas-webshell-name" . }}
+  labels:
+    {{- include "oauth2-proxy-tpaas-webshell.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.webshell.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "oauth2-proxy-tpaas-webshell.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "oauth2-proxy-tpaas-webshell.labels" . | nindent 8 }}
+        {{- with .Values.extraLabels }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "oauth2-proxy-tpaas-webshell-name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --provider={{ .Values.webshell.config.provider }}
+            - --email-domain={{ .Values.webshell.config.emailDomain }}
+            - --upstream={{ .Values.webshell.config.upstream }}
+            - --scope={{ .Values.webshell.config.scope }}
+            - --client-id={{ .Values.webshell.config.clientId }}
+            - --redirect-url={{ .Values.webshell.config.redirectUrl }}
+            - --http-address={{ .Values.webshell.config.httpAddress }}
+            - --cookie-secure={{ .Values.webshell.config.cookieSecure }}
+            - --cookie-secret={{ .Values.webshell.config.cookieSecret }}
+            - --pass-basic-auth=true
+            - --pass-user-headers=true
+            - --whitelist-domain={{.Values.webshell.config.whitelistDomains}}
+            - --skip-provider-button=true
+            - --cookie-expire={{ .Values.webshell.config.cookieExpire }}
+          env:
+            - name: OAUTH2_PROXY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: {{ include "oauth2-proxy.fullname" . }}-client-secret
+          envFrom:
+            {{- include "liveness-probe"  (dict "api" .Values.webshell.container.port) | indent 10 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "oauth2-proxy-cwd-internal-name" . }}
+  labels:
+    {{- include "oauth2-proxy-cwd-internal.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.cwd.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "oauth2-proxy-cwd-internal.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "oauth2-proxy-cwd-internal.labels" . | nindent 8 }}
+        {{- with .Values.extraLabels }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "oauth2-proxy-cwd-internal-name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.ldapTag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --provider={{ .Values.cwd.config.provider }}
+            - --email-domain={{ .Values.cwd.config.emailDomain }}
+            - --upstream={{ include "oauth2-proxy-cwd-internal-upstream" . }}
+            - --scope={{ .Values.cwd.config.internal.scope }}
+            - --client-id={{ .Values.cwd.config.internal.clientId }}
+            - --redirect-url={{ .Values.cwd.config.internal.redirectUrl }}
+            - --http-address={{ .Values.cwd.config.httpAddress }}
+            - --cookie-secure={{ .Values.cwd.config.cookieSecure }}
+            - --cookie-secret={{ .Values.cwd.config.cookieSecret }}
+            - --pass-basic-auth=true
+            - --pass-user-headers=true
+            - --whitelist-domain={{.Values.cwd.config.whitelistDomains}}
+            - --skip-provider-button=true
+            - --cookie-expire={{ .Values.cwd.config.cookieExpire }}
+            - --profile-url={{ .Values.cwd.config.profileUrl }}
+          env:
+            - name: OAUTH2_PROXY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: {{ include "oauth2-proxy.fullname" . }}-internal-client-secret
+          envFrom:
+            {{- include "liveness-probe"  (dict "api" .Values.cwd.container.port) | indent 10 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{include "oauth2-proxy-cwd-internal-nginx-name" .}}
+  labels:
+    {{- include "oauth2-proxy-cwd-internal-nginx.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.cwd.nginx.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "oauth2-proxy-cwd-internal-nginx.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "oauth2-proxy-cwd-internal-nginx.labels" . | nindent 8 }}
+        {{- with .Values.extraLabels }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "oauth2-proxy-cwd-internal-nginx-name" . }}
+          image: "{{ .Values.cwd.nginx.image.repository }}:{{ .Values.cwd.nginx.image.tag }}"
+          imagePullPolicy: {{ .Values.cwd.nginx.image.pullPolicy }}
+          volumeMounts:
+            {{- include "volume-mount-cwd-nginx" . | nindent 10 }}
+          envFrom:
+            {{- include "liveness-probe"  (dict "api" .Values.cwd.nginx.container.port) | indent 10 }}
+      volumes:
+        {{- include "volume-cwd-internal-nginx" . | nindent 6 }}

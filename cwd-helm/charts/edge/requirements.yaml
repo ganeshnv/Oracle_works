@@ -1,0 +1,25 @@
+dependencies:
+  # https://github.com/helm/charts/tree/master/stable/nginx-ingress
+  - name: observer
+    version: 0.1.0
+    repository: file://../../charts/observer
+    condition: observer.enabled
+
+  # https://github.com/helm/charts/tree/master/stable/nginx-ingress
+  - name: ingress-nginx
+    version: 4.3.0
+    repository: file://../../charts/cwd-dev-helm-virtual/nginx-ingress/ingress-nginx
+    condition: nginx-ingress.enabled
+
+  # https://hub.helm.sh/charts/jetstack/cert-manager
+  - name: cert-manager
+    version: v1.8.2
+    repository: file://../../charts/cwd-dev-helm-virtual/cert-manager/cert-manager 
+    condition: cert-manager.enabled
+
+  # https://github.com/helm/charts/tree/master/stable/external-dns
+  - name: oci-external-dns
+    version: 0.1.1
+    repository: file://../../charts/oci-external-dns
+    condition: oci-external-dns.enabled
+#    repository: https://kubernetes-charts.storage.googleapis.com

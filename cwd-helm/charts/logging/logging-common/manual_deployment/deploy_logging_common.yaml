@@ -1,0 +1,142 @@
+# Source: logging-common/charts/logging-common-base/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: logging-common-base-fluentd-tls
+  labels:
+    app.kubernetes.io/name: logging-common-base
+    helm.sh/chart: logging-common-base-2.7.2
+    app.kubernetes.io/instance: logging-common
+    app.kubernetes.io/version: "2.7.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  ca.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM5ekNDQWQrZ0F3SUJBZ0lSQU1CZHp4djRxL2s5eDlsK1N4M3BnQ3N3RFFZSktvWklodmNOQVFFTEJRQXcKRlRFVE1CRUdBMVVFQXhNS2MzWmpMV05oZEMxallUQWVGdzB5TkRBeU1EWXhNekl6TlRoYUZ3MHpOREF5TURNeApNekl6TlRoYU1CVXhFekFSQmdOVkJBTVRDbk4yWXkxallYUXRZMkV3Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBCkE0SUJEd0F3Z2dFS0FvSUJBUURyUlBtVXdzbVFZR28yeEZidGVLVHgvMkZvQW1BVU5WWjBRZmlVckhQSlphVmkKYkFvYTQwSVowTTV6T3lQc2d5aUtUOWltSEJDRkFLSzBhNnJ6ekdZQU9zSHd0T0QrQjA3WU5RNEJWcUVDcHFVQwpFR0J3ZVFLMDZ6WEYrSTJuNko4VDN3bEtBQVMzZkllZldHOTdhemlqeEFUcE5Ua3JwdUluQmZsdGVGRGYxVnhlCmVKMUdpN2lsUmlIMUVvOGo4MVJ3dnM1TzErQmVZS1JwR3pQYjZwZFNCWVVnS3FOMEhrRi9KV0JXMWRwNEV3azcKa2pBWG1qTmlLOGpyTjZlWFh4eW1wVXIvRXBiOUo5QnRzb3hJYXFSbzBRVVJ6K2UvWXR2c1Qvd2g5ZytMLzYwdAo2OVROM2tEb000a2d3UDBmRFc1cFpENDZNTm1BUFV4ck0zcFVTbzBkQWdNQkFBR2pRakJBTUE0R0ExVWREd0VCCi93UUVBd0lDcERBZEJnTlZIU1VFRmpBVUJnZ3JCZ0VGQlFjREFRWUlLd1lCQlFVSEF3SXdEd1lEVlIwVEFRSC8KQkFVd0F3RUIvekFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBbkJXazR3cGkvYjY5NXpRN3lsSWIvcUs3V3BFNAppQXNnWENmNFFCRmh0SlJRK2c5OFR0MHdmL1M0bVpEQytQeVE1bUxreExkYk10TDZCZXNsa0U4UllBZzhDcjYwClFHMlFGK2pPak5zN2xKbDhCbWtJT1NuUDcyaDhnM3NmSEdvOFpzbFZNck4wR1k4bUovMFJKZXhOaVRJeVRYUUoKS3pDN000MjcrYVR0c2JVaU1heTllTk5yd2l3c1hOOVFrTEFvNmZ5QkJmVjdCQ2Z6ZFlMODd0K0pxTzQzbDFaVwpraUExME5DL3lmTDY1SUFhQ292cC9BckF1N3JtRkl2NWtpVFZSV1pJRFBFSE4yajY4Nm0ySzlKYWZ3cU9vQjlpClZsWFFTYUZXY1cvTGUvK3o2eDRtRU1YZ29yZjdrLzlKZURUdjBNUlRSbit5T2FSTE9SOU9aclVISnc9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURIakNDQWdhZ0F3SUJBZ0lSQUxVMno2dTlEWWdJWjdBbDJySjNCTzh3RFFZSktvWklodmNOQVFFTEJRQXcKRlRFVE1CRUdBMVVFQXhNS2MzWmpMV05oZEMxallUQWVGdzB5TkRBeU1EWXhNekl6TlRoYUZ3MHlOVEF5TURVeApNekl6TlRoYU1EOHhQVEE3QmdOVkJBTVROR3h2WjJkcGJtY3RZMjl0Ylc5dUxXSmhjMlV0Wm14MVpXNTBaQzV6CmVYTjBaVzB1YzNaakxtTnNkWE4wWlhJdWJHOWpZV3d3Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXcKZ2dFS0FvSUJBUURCdUtnK1kxdGJaSkhvcDB0Nm90RmszazVNMmo0QkZiNHhzaTdKN2N2RVp5TnNuN2t1R1hBVApOU3MxTTBFcEpaYWZvbjVjZ1pjYnJwRmRmWWZIeEJnSzJuTkkvV2duNWZDK1pOU1VTakduYlB2Y1lpOURQTlc2CndFTUwrNndrQ2p4WGRmbGRramVEWTUyd3hHelFtcWZBOHZlZTRocWxyTG1wTll4aUYwZUpIdlZVWWo1eEt1ckkKeEpiY0ZqY0NpSmJkWVhhdUtwbUJtVXh0TUxyT3NMMWNsUVgrTG81Nlg0dWRmelY4NEhvbU15UFY1WVdvakpqWQpTMjc4azQ2bElLbTVrQzdyVE9Ka2lHZ2VLTFFuOVJXZHRoNTY5aTJETnozUFVjQTR4Zk5hcXBERXpaWTBteU5LClBacjYwVGE2TS9FclFYZWh4NXlBcGlJTzNKbzlBY3hOQWdNQkFBR2pQekE5TUE0R0ExVWREd0VCL3dRRUF3SUYKb0RBZEJnTlZIU1VFRmpBVUJnZ3JCZ0VGQlFjREFRWUlLd1lCQlFVSEF3SXdEQVlEVlIwVEFRSC9CQUl3QURBTgpCZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFCR0VKUFdoT2h2aUxpdmRGc0hGKzFxazRkbmJ0Nlp0R3dRN1ZvVFRaCk51VFFGVUdqQUtmZUQzWnBkdjhUeFpXNWtXbGFRcmx1OHpOUXRucXBLNHBVWUdXSVNzeVFMSFNhMWJlemZlbE0KK3pSdEdkRTZCM0EwazQ1LzYycHJDRTFjVGh3R0E0TlEybWlvZjIvaDdUSTFLR2huR012dGVEc0svYWNwczBKWAozNlNlT0cwbTlMTDFpd2o0dFVvNG5KQ1EzRXBNODIzSHBNMk9sQmVlTzJ1SUk5RmkzSzhlb0ZxeExFaVpiZDVtCnNZc0lGOWlkbzdiTVk1ajVRb09XeFVkTzVoakhmcHh4cDIwNzlSWURZd3k1eUxKb3FzRkJzQmJ0NVpLU0t5SEYKdGhPSXdjbjNLU0N6QVEwb0luT3llTVVHZU1CanNHOTdQOTUwSVNBV2g4R05wdz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+  tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcEFJQkFBS0NBUUVBd2Jpb1BtTmJXMlNSNktkTGVxTFJaTjVPVE5vK0FSVytNYkl1eWUzTHhHY2piSis1CkxobHdFelVyTlROQktTV1duNkorWElHWEc2NlJYWDJIeDhRWUN0cHpTUDFvSitYd3ZtVFVsRW94cDJ6NzNHSXYKUXp6VnVzQkRDL3VzSkFvOFYzWDVYWkkzZzJPZHNNUnMwSnFud1BMM251SWFwYXk1cVRXTVloZEhpUjcxVkdJKwpjU3JxeU1TVzNCWTNBb2lXM1dGMnJpcVpnWmxNYlRDNnpyQzlYSlVGL2k2T2VsK0xuWDgxZk9CNkpqTWoxZVdGCnFJeVkyRXR1L0pPT3BTQ3B1WkF1NjB6aVpJaG9IaWkwSi9VVm5iWWVldll0Z3pjOXoxSEFPTVh6V3FxUXhNMlcKTkpzalNqMmErdEUydWpQeEswRjNvY2VjZ0tZaUR0eWFQUUhNVFFJREFRQUJBb0lCQVFDNFBlRjFoSldNdEhlNAo1L04zYllidEFpbENHb2JDRFdYWWFmanFBQW0rZjhGSFBCbW82SFNaTUFZcUVOYzJSUk9lTzdNbVUvSGRXQWZVCi9PQzRjNTNTSkxWa2crNGRsQ21GU3V5TEpJMVpDT1A1VkVCVEdIYkZxTG1ibWY2OFFDZm5uc0pONWhSNkY3SVEKUHFDblBZK3lpT0pNOEFvYjY4eWdTOWQ2SzEzVDREd3R2RWhOVkdjb0xmc0NpdFhQTnZZU0hYWFAxY0M3bU9aWgo2MjBRMFB6Tis4Y0p5Y2hwRkVjcTBFQ2FYMzJkR3ZrT1ZLaENCeXdLdnJxbGZIZGhaTDlwSThzUUI1TE03MDVICk8wNTRTUzU1TnN3SlhzdnpNdzk2S1pVanhSTkxFNHBTL296M1FlSHdtK2tKUWMvYkloV0hhQldzU3JzVTBFRjgKTUh1UHB3WEJBb0dCQVA5WUF6eDlDTXRHbStrbVRMVnRsaEZIdGZRWnRraXlHL0RYdzVKelIyQWxhOXJLbW43YQpxQ2dnbk5wOFJJUkxWZGxZeG04M3ZITStvekJKVmM4WTJaTFdPaDBPNkhQekpYbDFRRytLRzFnVVQwa05ZTDFPCmJtNUlLcHpOZTYvdVh0MTU4dTh2TDZKTGZxSEpld0FVMTZSQThKV1BtdE1EZGNqSFBVaDBOT0wxQW9HQkFNSTQKR3B0TTg3d1VZczU3c2lqWnJIQ2lOeGFua0EyY2xDVUJGYUU0MEFNWm90WGRUTHd0MW8yR1BBaXEzaFg4ckJnNApSemgwRmJCd2U5YzNDU2dOS1FOdHdFdjhmK040ZDM3NXNuTHFFSTB6c0NJa0lLNnpiKzIrVlIzdEpsWnlZeWVmCktadmQ3QUVRR24vRGRVN3l3N2w2WjhPSlo0djlkMzN3UldvZFhWejVBb0dBTWRzQlpzSVRBWDJiMjMzNjVFR3QKVjFwbEVIQWt3elRqZDdicEhLTWRnSXhON3I0NFJDUjFTTUIxWDhON3JVajRUaU9qT3Z2cTg2VjdQMlpTTnNsbgpVZUE2SUlwVW9LOE0xaFlxcXB5UWtqWUU5UUtEclBLdlpTRDZFUHVkOXMvWC9lNWRuSTNlQXhZeWQyeGJjN3llCkRoZ1A0V1BVbXZiRi9KbktRV2RQSERFQ2dZQXovRnh5MFVnMFFhaW82RWNwMUFucUpDRm11UGRBRFhkQjZHWm4KdnhNK29UQUsycTlkZDArRWxqZWZna3pyeWJRdXozR1ExTkd4Wm9wZmN1WEtpS3MvdGJMUkpBYi9WaEYyTlZQawptbTVQdlZRWjcxMm9KWE9DU1gzekFyVk9VbFBrR1NCRURrVExqQW5yeE4remdCdVBuQW9HTnRNMmoyUGFtK09ZCm9iK0owUUtCZ1FDdUxlRnNuR04vVFQrdzNGU3VGUzI4VXJVTE9xRmZxOURCdVZwNGN3LzNxbEZMR1JDWWZmaVAKWXZwNDQwdldrOHlBTlJyeUc5aWk2d09LclVrWVdzc1VoMEFrUkpwRmhTaDZBdzhDOXdTdW1CRE5qSlZSTFpaZApncXA1VTlWZUJ6cHNod3hFcGk3SE53NDR1M21EQlFMVm81K1J0NWJDV215WFp1T0VXaTI0T0E9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
+---
+# Source: logging-common/charts/logging-common-base/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: logging-common-base-fluentbit-tls
+  labels:
+    app.kubernetes.io/name: logging-common-base
+    helm.sh/chart: logging-common-base-2.7.2
+    app.kubernetes.io/instance: logging-common
+    app.kubernetes.io/version: "2.7.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  ca.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM5ekNDQWQrZ0F3SUJBZ0lSQU1CZHp4djRxL2s5eDlsK1N4M3BnQ3N3RFFZSktvWklodmNOQVFFTEJRQXcKRlRFVE1CRUdBMVVFQXhNS2MzWmpMV05oZEMxallUQWVGdzB5TkRBeU1EWXhNekl6TlRoYUZ3MHpOREF5TURNeApNekl6TlRoYU1CVXhFekFSQmdOVkJBTVRDbk4yWXkxallYUXRZMkV3Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBCkE0SUJEd0F3Z2dFS0FvSUJBUURyUlBtVXdzbVFZR28yeEZidGVLVHgvMkZvQW1BVU5WWjBRZmlVckhQSlphVmkKYkFvYTQwSVowTTV6T3lQc2d5aUtUOWltSEJDRkFLSzBhNnJ6ekdZQU9zSHd0T0QrQjA3WU5RNEJWcUVDcHFVQwpFR0J3ZVFLMDZ6WEYrSTJuNko4VDN3bEtBQVMzZkllZldHOTdhemlqeEFUcE5Ua3JwdUluQmZsdGVGRGYxVnhlCmVKMUdpN2lsUmlIMUVvOGo4MVJ3dnM1TzErQmVZS1JwR3pQYjZwZFNCWVVnS3FOMEhrRi9KV0JXMWRwNEV3azcKa2pBWG1qTmlLOGpyTjZlWFh4eW1wVXIvRXBiOUo5QnRzb3hJYXFSbzBRVVJ6K2UvWXR2c1Qvd2g5ZytMLzYwdAo2OVROM2tEb000a2d3UDBmRFc1cFpENDZNTm1BUFV4ck0zcFVTbzBkQWdNQkFBR2pRakJBTUE0R0ExVWREd0VCCi93UUVBd0lDcERBZEJnTlZIU1VFRmpBVUJnZ3JCZ0VGQlFjREFRWUlLd1lCQlFVSEF3SXdEd1lEVlIwVEFRSC8KQkFVd0F3RUIvekFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBbkJXazR3cGkvYjY5NXpRN3lsSWIvcUs3V3BFNAppQXNnWENmNFFCRmh0SlJRK2c5OFR0MHdmL1M0bVpEQytQeVE1bUxreExkYk10TDZCZXNsa0U4UllBZzhDcjYwClFHMlFGK2pPak5zN2xKbDhCbWtJT1NuUDcyaDhnM3NmSEdvOFpzbFZNck4wR1k4bUovMFJKZXhOaVRJeVRYUUoKS3pDN000MjcrYVR0c2JVaU1heTllTk5yd2l3c1hOOVFrTEFvNmZ5QkJmVjdCQ2Z6ZFlMODd0K0pxTzQzbDFaVwpraUExME5DL3lmTDY1SUFhQ292cC9BckF1N3JtRkl2NWtpVFZSV1pJRFBFSE4yajY4Nm0ySzlKYWZ3cU9vQjlpClZsWFFTYUZXY1cvTGUvK3o2eDRtRU1YZ29yZjdrLzlKZURUdjBNUlRSbit5T2FSTE9SOU9aclVISnc9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMzekNDQWNlZ0F3SUJBZ0lSQUtwMjFpUW5aMFd2aGN5Y0pUL3ZDelV3RFFZSktvWklodmNOQVFFTEJRQXcKRlRFVE1CRUdBMVVFQXhNS2MzWmpMV05oZEMxallUQWVGdzB5TkRBeU1EWXhNekl6TlRoYUZ3MHlOVEF5TURVeApNekl6TlRoYU1BQXdnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFEbE4rcXVNNEpXCnVvSmc5VSs2ZWlGYjU2NHBaVzdwZFF2clJ6MzB6YlZoOERsd3V6QWl2aHBuYVBmR1V2VDYwZnN0cmhvMG5oQ2QKNzJBRENSaU5PTEJQb1huMkI1aTI2S3RTOUk0eElKcWY3ZHVCbTV4SysrajhFVmo0TG5LUVdVditRWnpvZ2ZxcQpqR0duMXhac2NKQTVrbEY3YmdnYkkrdVZaZU9MVFpWVHRSTzN3bkFoOEpKY0MveWtMZmxTUVZsdlpDeDBDSWZXClZ6UjQxanVHOGJFLy9RUExWSFZndGZmdDM4bnd4M1luamFuMDNqMUFEVEgwd2xBR1JTZ0V1Y25SeHM3ZmtBTWwKYzdEMWlselQ3dzQ1Q204VHZobFVzMFNzV0FTZHhVUUZuT0huZjhaT213T1BsYUxBejV3bmltTDEwNWFCVmRrNwp5SEd1dVJzN1A1NTVBZ01CQUFHalB6QTlNQTRHQTFVZER3RUIvd1FFQXdJRm9EQWRCZ05WSFNVRUZqQVVCZ2dyCkJnRUZCUWNEQVFZSUt3WUJCUVVIQXdJd0RBWURWUjBUQVFIL0JBSXdBREFOQmdrcWhraUc5dzBCQVFzRkFBT0MKQVFFQXMvUlpaUVhMR0piMkZENnAwM2N3UmZHMmwwVmVBMmsxTzQyQ3p1V1ZKSHdXN2JBSXhKcU9HckpuVGNxVAo3SkxqSHB1MThxZDUyakp5Qld2ZXQ5N1VQWVpLNHQxYjNkRWZTN0NUc0ltb2FkbGhmRXRRcnR4elZtbWM4R1NTCkI5TlB6VG94aStUNHRjemE0dVE0eFg3L0VWVWowQUNlUENUTmdWd0FNM2ttLy85Z2JFQWZqUk5Td3pORXNnbzkKNXZTUlBmeEo3NEhucFU4TU54YlpqZFgxYXVYOVBNVkloVEk3eG40SFdVZXNQNC9IT0lxWkpGcVhESEYyL3V0dApGWHdPOHIxTFZGc2I1VVY3TVR1WVNQV0owcDBTckYvUU5KdkFRUEtlVVpXS3ZJMSszaWdVbzdmYmlVZ2NCVWtOCmVtWFRNcFhlSEFYUHErQTRZYnFSWDhUVmV3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+  tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcGdJQkFBS0NBUUVBNVRmcXJqT0NWcnFDWVBWUHVub2hXK2V1S1dWdTZYVUw2MGM5OU0yMVlmQTVjTHN3CklyNGFaMmozeGxMMCt0SDdMYTRhTko0UW5lOWdBd2tZalRpd1Q2RjU5Z2VZdHVpclV2U09NU0NhbiszYmdadWMKU3Z2by9CRlkrQzV5a0ZsTC9rR2M2SUg2cW94aHA5Y1diSENRT1pKUmUyNElHeVBybFdYamkwMlZVN1VUdDhKdwpJZkNTWEF2OHBDMzVVa0ZaYjJRc2RBaUgxbGMwZU5ZN2h2R3hQLzBEeTFSMVlMWDM3ZC9KOE1kMko0MnA5TjQ5ClFBMHg5TUpRQmtVb0JMbkowY2JPMzVBREpYT3c5WXBjMCs4T09RcHZFNzRaVkxORXJGZ0VuY1ZFQlp6aDUzL0cKVHBzRGo1V2l3TStjSjRwaTlkT1dnVlhaTzhoeHJya2JPeitlZVFJREFRQUJBb0lCQVFDdGkyZDRXdkZjM3JzbAowN1Y0bDAwNGV6SEdqOUNvbXdEYU1zYzYyS0J5dFdHWDgzR2ZiRlVyWkRMc2loU0c3b0tBOUdkTTNUdnhoN0ltCnVqVkhmdHNtZnppS3lQZWJ6SThpTUp5VG4zN1NoVkVEVVNERk9QTU9IY2hCcDFELzcwdjFCaEpaaTBlUTV0WnQKTUJEL0t6NVhDR3YreXJFQ2MzRERYVEFwWVNVbENPNFJQRFFpc0xaYk9YNmNuQk1xWHQ2cWg0d3R0TThIM2lNSQpabUh3ZDJHZzlwVklXNEFsckgyZHpKMFZzQjRTSE9hNHdlQ2xIM0dQRCtGZDFhZ1dURlF5SVh5Z254Wit2MUhsCi9VWm92bG43V0wwNVpCYzI2WFJkcGhiRXMwWEx5dzI4a0h5NzN3bjFuMkhuRDRBRTJucHBQMTk0U3lFUHlHUkwKcmJyNVh3SnRBb0dCQVBwWkpLU3lWVisvU2ozU0xXRjRDMHFIR3BjYW80T043eHpWb284blRUTUkrazgwMzJKRQpXbXBSR3VKZG9RNGFjcnkyL3Y1Uzl6ckRDSzFiSmVNV3F0NXRpWUh2bEVubGxlYmxqWmNtVWJkSDg4Ri9jZm5BCmxMbmFlT1c1V293cnVVUnBKV2N4WFRkUHNTSER3SGVLaWZuNHcvQjJVc0FiVU5zeFJnWTNyMjhMQW9HQkFPcGsKcUJORkJ2Y1lSWVV3dEFFYThlU24yMWlJK1U2ZFg5NXdSdnVmRnhOanR3V3RUY3RRRjRsVUlwa3NITUV1cS95aQpPUWdCVmUxZzdPbGcyVG9RaTlCSmpVMVczSXBHVjU0Mk80U0lDN1F6L0ZZNG1yby82U01EamF4d2FpWG94a2JRClcvR1BPNElMZjN5b1ZnTE5iMGI1ZmZOM0pLQnZlWHNkUms1aWpTc0xBb0dCQU1oTW1GL1pleXN2THFSRnpCOUcKMzZuU2JMam5ERnFPTGZqaENMNEdrT0s3VlNJWVNINGorRDlHQXYrSUwvckx1Rzg2N3N2bTczMnBYQUR2ZzJHcwoyaXM2Y3FGdVlUTzZwL1BrU0NQZCtkVnRrUjZJN0ZVSit6UzBFclNpVjByOUZLOGlmVldTRG1YWnNmdzAxWUlQCmF4T0FNS3pzem9wN2tIYS9kcW8wMVgwL0FvR0JBTURaT2xSSWFkZXBkNkdERmNjSEJWaXRKdEpzT0RzUFRvNTAKY0dLY1hWOE5uc3NqOEtyRDVlbU9lTHp2eDJUR1lxa0VTOG9qVnpCc205L1VXRVhtMFRINUlqSXNzbDF1VEs2VwpUbGZYbTFHVHFCekVpOEdMemVTS0N1bUN3RU1haHZCQ2hETjJObTdqeU91bWtNWFRncWV4cEloSlViQlNwMis5CkFWaUN5MFZMQW9HQkFORG5OVzFyR0l2UlZNdWZSWFN6ZDI5V0NURWcvMFozM1VlL1RxMnZjUThySjRIeURxRlgKQVpYYUY4Q1QwVFRPM1pkbTFid1Y2QjRGS2ppd21UNER1c1NBSFdmaytlSGdnNGprRmRPVFArRmwxeG5Fdm1jNwpxZFkzZ3ByckZUeCtBbXdad2dzOW13UWxYaXlkVXpNK2RWMXM4MDM4bUdLOVF2LzJ5a2REdFIwTwotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
+---
+# Source: logging-common/templates/raw-cluster-flow.yaml
+apiVersion: logging.banzaicloud.io/v1
+kind: ClusterFlow
+metadata:
+  name: logging-common-raw
+  labels:
+    app.kubernetes.io/name: logging-common
+    helm.sh/chart: logging-common-0.1.0
+    app.kubernetes.io/instance: logging-common
+    app.kubernetes.io/managed-by: Helm
+spec:
+  filters:
+    # https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions
+    # https://github.com/banzaicloud/logging-operator/blob/master/docs/plugins/filters/detect_exceptions.md
+    - detectExceptions:
+        multiline_flush_interval: "0.1"
+        languages:
+          - java
+          - python
+    # https://github.com/fluent-plugins-nursery/fluent-plugin-concat
+    # https://github.com/banzaicloud/logging-operator/blob/master/docs/plugins/filters/concat.md
+    - concat:
+        multiline_start_regexp: /^--START MULTILINE--/
+        multiline_end_regexp: /^--END MULTILINE--/
+    # https://github.com/banzaicloud/logging-operator/blob/master/docs/plugins/filters/parser.md#Parse-Section
+#  When put this section in, in lumberjack:
+#   1.  message field ends up in #message
+#   2.  none of the k8s metadata/contextual information is loaded.
+#  Not sure if it is a lumberjack output issue dealing with the parsed format or something else
+#  with how the parser is configured?
+#  Would be good to learn why later
+#    - parser:
+#        remove_key_name_field: true
+#        parse:
+#          type: multi_format
+#          patterns:
+#            # TBD: Should we parse nginx log from ingress too? https://docs.fluentd.org/parser/nginx
+#            # https://docs.fluentd.org/parser/json
+#            - format: json
+#              # See https://www.regextester.com/95560 (added anchors to start ^ and end $)
+#              # expression: /^\{.*\:\{.*\:.*\}\}$/
+#            # https://docs.fluentd.org/parser/none
+#            - format: none
+  outputRefs:
+    - logging-common-lumberjack
+  selectors:
+    common-logging-flow: enabled
+---
+# Source: logging-common/templates/lumberjack-cluster-output.yaml
+apiVersion: logging.banzaicloud.io/v1
+kind: ClusterOutput
+metadata:
+  name: logging-common-lumberjack
+  labels:
+    app.kubernetes.io/name: logging-common
+    helm.sh/chart: logging-common-0.1.0
+    app.kubernetes.io/instance: logging-common
+    app.kubernetes.io/managed-by: Helm
+spec:
+  lumberjack:
+    compartment: ocid1.compartment.oc1..aaaaaaaafjtjh5cdfnl5f35cpvtkm6pfwtvqvyjzdnfj2w5zb42atqpnxncq
+    namespace: cwd-staging
+---
+# Source: logging-common/charts/logging-common-base/templates/logging.yaml
+apiVersion: logging.banzaicloud.io/v1
+kind: Logging
+metadata:
+  name: logging-common-base
+  labels:
+    app.kubernetes.io/name: logging-common-base
+    helm.sh/chart: logging-common-base-2.7.2
+    app.kubernetes.io/instance: logging-common
+    app.kubernetes.io/version: "2.7.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  controlNamespace: system
+  fluentd:
+    tls:
+      enabled: true
+      secretName: logging-common-base-fluentd-tls
+      sharedKey: FenoLosv2%Gonj
+    configReloaderImage:
+      repository: iad.ocir.io/dataservicedev1/jimmidyson/configmap-reload
+      tag: v0.2.2
+    image:
+      repository: iad.ocir.io/dataservicedev1/cre/banzaicloud/fluentd
+      tag: v1.7.4
+    metrics:
+      serviceMonitor: true
+  fluentbit:
+    tls:
+      enabled: true
+      secretName: logging-common-base-fluentbit-tls
+      sharedKey: FenoLosv2%Gonj
+    extraVolumeMounts:
+    - destination: /u01/data/docker/containers
+      readOnly: true
+      source: /u01/data/docker/containers
+    image:
+      repository: iad.ocir.io/dataservicedev1/fluent/fluent-bit
+      tag: 1.3.2
+    metrics:
+      serviceMonitor: true
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 300M
+      requests:
+        cpu: 300m
+        memory: 200M

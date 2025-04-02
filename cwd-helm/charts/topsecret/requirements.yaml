@@ -1,0 +1,23 @@
+dependencies:
+  # https://github.com/helm/charts/tree/master/stable/nginx-ingress
+  - name: observer
+    version: 0.1.0
+    repository: file://../../charts/observer
+    condition: observer.enabled
+
+  # https://github.com/banzaicloud/bank-vaults/tree/master/charts/vault-operator
+  - name: vault-operator
+    version: 1.19.0
+    repository: file://../../charts/cwd-dev-helm-virtual/vault-operator/vault-operator
+    condition: vault-operator.enabled
+
+  - name: vault-secrets-webhook
+    version: 1.19.0
+    repository: file://../../charts/cwd-dev-helm-virtual/vault-secrets-webhook/vault-secrets-webhook
+    condition: vault-secrets-webhook.enabled
+
+  - name: vault
+  # alias: vault-k8s
+    version: 0.19.0
+    repository: file://../../charts/cwd-dev-helm-virtual/vault/vault
+    condition: vault-k8s.enabled

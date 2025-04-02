@@ -1,0 +1,24 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "elasticsearch.loadbalancerService" . }}
+  labels:
+    release: {{ .Release.Name | quote }}
+    chart: {{ .Chart.Name }}
+    app: {{ template "elasticsearch.loadbalancerName" . }}
+  annotations:
+    service.beta.kubernetes.io/oci-load-balancer-internal: "true"
+    service.beta.kubernetes.io/oci-load-balancer-security-list-management-mode: "None"
+spec:
+  type: LoadBalancer
+  selector:
+    release: {{ .Release.Name | quote }}
+    chart: {{ .Chart.Name }}
+    app: {{ template "elasticsearch.loadbalancerName" . }}
+  ports:
+    - name: {{ .Values.elasticsearch.service.httpPortName | default "http" }}
+      protocol: TCP
+      port: {{ .Values.elasticsearch.httpPort }}
+    - name: {{ .Values.elasticsearch.service.transportPortName | default "transport" }}
+      protocol: TCP
+      port: {{ .Values.elasticsearch.transportPort }}

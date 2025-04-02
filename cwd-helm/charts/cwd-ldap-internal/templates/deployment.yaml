@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "cwd-ldap-internal.name" . }}
+  labels:
+{{ include "cwd-ldap-internal.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cwd-ldap-internal.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.podExtraAnnotations }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+      labels:
+        {{- include "cwd-ldap-internal.labels" . | nindent 8 }}
+        {{- with .Values.podExtraLabels }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+      initContainers:
+      {{- include "initContainers-wallet-file" . | indent 6 }}
+      containers:
+        - name: {{ template "cwd-ldap-internal.name" . }}
+          image: {{ template "image-url" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+          {{- include "volume-mount-db-wallet-unzipped" . | indent 10 }}
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: {{ include "cwd-ldap-internal.fullname" . }}-cwddb-secret
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: {{ include "cwd-ldap-internal.fullname" . }}-cwddb-secret
+            - name: CWD_LDAP_FAILURETICKETSERVICE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: {{ include "cwd-ldap-internal.fullname" . }}-jira-secret
+          envFrom:
+          {{- include "application-properties" . | indent 10 }}
+          {{- include "liveness-probe"  (dict "api" .Values.container.port) | indent 10 }}
+      volumes:
+        {{- include "volume-db-wallet" . | nindent 6 }}
+        {{- include "volume-db-wallet-unzipped" . | nindent 6 }}

@@ -1,0 +1,6 @@
+dependencies:
+
+  - name: elasticsearch
+    version: 7.9.3
+    repository: file://../../charts/cwd-dev-helm-virtual/elasticsearch/elasticsearch 
+    condition: elasticsearch.enabled

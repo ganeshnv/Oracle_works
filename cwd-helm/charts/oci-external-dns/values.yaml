@@ -1,0 +1,76 @@
+# https://github.com/helm/helm/blob/master/docs/charts_hooks.md
+image:
+#  repository: iad.ocir.io/dataservicedev1/registry-opensource-zalan-do/teapot/external-dns
+#  tag: latest
+  repository: iad.ocir.io/dataservicedev1/bitnami/external-dns
+  tag: v0.5.17-68-gfb05ce48-dirty
+  pullPolicy: IfNotPresent
+
+#  Manager of the domain on the A record.
+# In prod will needs to be changed to something unique so dev/QA envs don't accidently override prod
+# DNS entries.
+txtOwnerId: automation.peacock@oracle.com
+#  ociUserFingerprintVaultKey
+#  ociUserPrivateKeyVaultKey
+vaultSecretPath: secret/data/app_infra/external_dns
+#  These templates could just be strings.
+ociUserFingerprintVaultTmpl: "{{ .Data.data.OCI_USER_FINGERPRINT  }}"
+# Base64 encoded pem file in Vault.  If you use a non vault key, then make sure decode and indent
+# So this MUST be a template value.
+ociUserPrivateKeyVaultTmpl: "{{ .Data.data.OCI_USER_PRIVATE_KEY | base64Decode | indent 4 }}"
+ociUserId: ""
+tenancyId: ""
+region: ""
+compartmentId: ""
+replicas: 1
+
+sources: ["ingress"]  # service
+# provider: oci
+#domainFilters:
+#  - us-ashburn-1.oci.oc-test.com
+extraArgs:
+  oci-config-file: /etc/kubernetes/oci.yaml
+  oci-domain-mode: ""
+  # With OCI DNS reading txt entry seems to not return the txt owner which causes the external dns
+  # to not be correct so external dns will not update the entry.
+  registry: "noop"
+
+deploymentAnnotations: {}
+#vaultAuthRole: default
+#  "vault.security.banzaicloud.io/vault-role": "devops-dataservicedev1-edge"
+
+extraLabels: {}
+
+service:
+  type: ClusterIP
+  port: 7979
+  annotations: {}
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 2
+  successThreshold: 1
+
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+## Prometheus Exporter / Metrics
+metrics:
+  enabled: true
+
+  serviceMonitor:
+    enabled: true
+    interval: 60s
+    scrapeTimeout: 30s

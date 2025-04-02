@@ -1,0 +1,18 @@
+helmDefaults:
+  wait: false
+  timeout: 600
+  force: false
+  recreatePods: false
+
+repositories: []
+
+environments:
+  {{ .Environment.Name }}: {}
+
+releases:
+ - name: redis-cluster
+   # TODO: this namespace should be generic, not using environment name, need be renamed in production
+   namespace: cwd-apps
+   chart: .
+   values:
+   - ../../environments/{{ .Environment.Name }}/redis.yaml

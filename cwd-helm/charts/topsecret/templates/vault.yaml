@@ -1,0 +1,171 @@
+apiVersion: vault.banzaicloud.com/v1alpha1
+kind: Vault
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.vault.name }}
+  labels:
+    {{- include "topsecret.labels" . | nindent 4 }}
+spec:
+  size: {{ .Values.vault.size }}
+  image: {{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}
+  bankVaultsImage: {{ .Values.vault.bankVaults.image.repository }}:{{ .Values.vault.bankVaults.image.tag }}
+  statsdDisabled: true
+  serviceAccount: {{ .Release.Name }}-vault-operator
+  serviceMonitorEnabled: true
+
+{{/*  unsealConfig:*/}}
+{{/*    kubernetes:*/}}
+{{/*      secretNamespace: {{ .Release.Namespace }}*/}}
+{{/*      secretName: ""*/}}
+
+#  # Request an Ingress controller with the default configuration
+#  ingress:
+#    # Specify Ingress object annotations here, if TLS is enabled (which is by default)
+#    # the operator will add NGINX, Traefik and HAProxy Ingress compatible annotations
+#    # to support TLS backends
+#    annotations:
+#
+#    # Override the default Ingress specification here
+#    # This follows the same format as the standard Kubernetes Ingress
+#    # See: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#ingressspec-v1beta1-extensions
+#    spec: {}
+
+# A YAML representation of a final vault config file, this config represents
+# a HA config in Google Cloud.
+# See https://www.vaultproject.io/docs/configuration/ for more information.
+  config:
+    seal:
+      ocikms:
+        key_id: "{{ .Values.vault.oci.kmsKeyOcid }}"
+        crypto_endpoint: "{{ .Values.vault.oci.kmsVaultCryptoEndpoint }}"
+        management_endpoint: "{{ .Values.vault.oci.kmsVaultManagementEndpoint }}"
+        auth_type_api_key: "true"
+
+    storage:
+      oci:
+        namespace_name: "{{ .Values.global.oci.objectStoreNamespace }}"
+        bucket_name: "{{ .Values.vault.oci.dataBucket }}"
+        ha_enabled: "false"
+        lock_bucket_name: "{{ .Values.vault.oci.lockBucket }}"
+        auth_type_api_key: "true"
+
+    # This is a hack to work around vault-banks not supporting OCI as HA storage:
+    # https://github.com/banzaicloud/bank-vaults/blob/752c80ce549cb3dee572b0442364a274ef53831a/operator/pkg/apis/vault/v1alpha1/vault_types.go#L308
+    ha_storage:
+      oci:
+        namespace_name: "{{ .Values.global.oci.objectStoreNamespace }}"
+        ha_enabled: "true"
+        bucket_name: "{{ .Values.vault.oci.dataBucket }}"
+        lock_bucket_name: "{{ .Values.vault.oci.lockBucket }}"
+        auth_type_api_key: "true"
+
+    listener:
+      tcp:
+        address: "0.0.0.0:{{ .Values.vault.port }}"
+        tls_cert_file: /vault/tls/server.crt
+        tls_key_file: /vault/tls/server.key
+    api_addr: https://{{ .Release.Name }}-{{ .Values.vault.name }}.{{ .Release.Namespace }}:{{ .Values.vault.port }}
+
+    telemetry:
+      prometheus_retention_time: "24h"
+      disable_hostname: true
+
+    ui: true
+
+  volumes:
+    - name: oci-secret
+      secret:
+        secretName: {{ .Release.Name }}-{{ .Values.vault.name }}-oci
+
+  volumeMounts:
+    - name: oci-secret
+      mountPath: /home/vault/.oci
+      readOnly: true
+
+  externalConfig:
+    # Taken from https://github.com/banzaicloud/bank-vaults/blob/master/operator/deploy/cr.yaml#L118-L126
+    policies:
+      - name: allow_secrets
+        rules: path "secret/*" {
+            capabilities = ["create", "read", "update", "delete", "list"]
+          }
+      - name: allow_pki
+        rules: path "pki/*" {
+          capabilities = ["create", "read", "update", "delete", "list"]
+          }
+          path "pki_int/*" {
+          capabilities = ["create", "read", "update", "delete", "list"]
+          }
+      # See https://github.com/hashicorp/nomad/issues/4372#issuecomment-395110630
+      # Need to be able to renew token to avoid;
+      # URL: PUT https://topsecret-vault.system-secret:8200/v1/auth/token/renew-self
+      #  Code: 403. Errors:
+      #  * permission denied
+      - name: allow_token_management
+        # Allow renewing and checking capabilities of our own token.
+        rules: path "auth/token/renew-self" {
+          capabilities = ["update"]
+          }
+          path "sys/capabilities-self" {
+            capabilities = ["update"]
+          }
+      - name: allow_sys
+        rules: path "sys/*" {
+          capabilities = ["create", "read", "update", "delete", "list"]
+          }
+      - name: allow_auth
+        rules: path "auth/*" {
+          capabilities = ["create", "read", "update", "delete", "list"]
+          }
+      - name: prometheus_operator
+        rules: path "sys/metrics" {
+          capabilities = ["read", "list"]
+          }
+    # Note: Per https://github.com/banzaicloud/bank-vaults/issues/542
+    # the namespace for the vault-secrets-webhook is used to log in when mutating k8s secrets.
+    # Hence the need to give system-secret power.
+    auth:
+      - type: kubernetes
+        roles:
+          # Allow every pod in the default namespace to use the secret kv store
+          # TODO:  Make restrictive
+          - name: default
+            bound_service_account_names: ["default", "topsecret-vault-secrets-webhook", "vault-secrets-webhook", "vault", "topsecret-vault-k8s-agent-injector"]
+            bound_service_account_namespaces: ["default", "system-secret"]
+            policies: ["allow_secrets", "allow_pki"]
+            ttl: 1h
+
+          - name: prometheus-operator
+            bound_service_account_names: ["monitoring-prometheus-oper-prometheus"]
+            bound_service_account_namespaces: ["system"]
+            policies: ["prometheus_operator","allow_auth","allow_pki"]
+            ttl: 4h
+          - name: cert-manager
+            bound_service_account_names: ["cert-manager-acct"]
+            bound_service_account_namespaces: ["system"]
+            policies: ["allow_pki"]
+
+      - type: oci
+        config:
+          home_tenancy_id: {{ .Values.vault.oci.tenancyOcid }}
+        roles:
+          - name: oci_administrators
+            ocid_list: [ {{ .Values.vault.oci.administratorsGroupOcid }} ]
+            token_policies: ["allow_secrets", "allow_pki", "allow_sys", "allow_auth" ]
+            token_ttl: 2764800
+
+    secrets:
+      - path: secret
+        type: kv
+        description: General secrets.
+        options:
+          version: 2
+
+    # Allows writing some secrets to Vault (useful for development purposes).
+    # See https://www.vaultproject.io/docs/secrets/kv/index.html for more information.
+# Bad place to put secure information since get get the vault crd from kubectl
+#    startupSecrets:
+#      - type: kv
+#        path: secret/data/patch_auto
+#        data:
+#          data:
+#            DB_PASSWORD: {{ .Values.vault.patch_auto_db_password }}

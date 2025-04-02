@@ -1,0 +1,19 @@
+{{/*{{- if .Values.vault.enabled }}*/}}
+{{/*apiVersion: cert-manager.io/v1alpha2*/}}
+{{/*kind: ClusterIssuer*/}}
+{{/*metadata:*/}}
+{{/*  name: vault-issuer*/}}
+{{/*  labels:*/}}
+{{/*    {{- include "edge.labels" . | nindent 4 }}*/}}
+{{/*spec:*/}}
+{{/*  vault:*/}}
+{{/*    path: pki_int/sign/{{- .Values.vault.vault_auth_role }}*/}}
+{{/*    server: {{ .Values.vault.url }}*/}}
+{{/*    caBundle: {{ .Values.vault.ca }}*/}}
+{{/*    auth:*/}}
+{{/*      kubernetes:*/}}
+{{/*        role: {{ .Values.vault.vault_auth_role }}*/}}
+{{/*        secretRef:*/}}
+{{/*          name: {{ .Values.vault.service_account_token }}*/}}
+{{/*          key: token*/}}
+{{/*{{- end }}*/}}

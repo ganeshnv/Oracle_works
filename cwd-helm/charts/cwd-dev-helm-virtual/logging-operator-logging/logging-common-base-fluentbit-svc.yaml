@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    banzaicloud.com/last-applied: '{"metadata":{"labels":{"app.kubernetes.io/managed-by":"logging-common-base","app.kubernetes.io/name":"fluentbit"},"name":"logging-common-base-fluentbit-monitor","namespace":"system","ownerReferences":[{"apiVersion":"logging.banzaicloud.io/v1beta1","controller":true,"kind":"Logging","name":"logging-common-base","uid":"a02a6423-2b84-4043-888c-b4443c17d404"}]},"spec":{"clusterIP":"None","ports":[{"name":"metrics","port":2020,"protocol":"TCP","targetPort":2020}],"selector":{"app.kubernetes.io/managed-by":"logging-common-base","app.kubernetes.io/name":"fluentbit"},"type":"ClusterIP"},"status":{"loadBalancer":{}}}'
+  labels:
+    app.kubernetes.io/managed-by: logging-common-base
+    app.kubernetes.io/name: fluentbit
+  name: logging-common-base-fluentbit-monitor
+  namespace: system
+spec:
+  clusterIP: None
+  ports:
+  - name: metrics
+    port: 2020
+    protocol: TCP
+    targetPort: 2020
+  selector:
+    app.kubernetes.io/managed-by: logging-common-base
+    app.kubernetes.io/name: fluentbit
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    banzaicloud.com/last-applied: '{"metadata":{"labels":{"app.kubernetes.io/managed-by":"logging-common-base","app.kubernetes.io/name":"fluentd"},"name":"logging-common-base-fluentd","namespace":"system","ownerReferences":[{"apiVersion":"logging.banzaicloud.io/v1beta1","controller":true,"kind":"Logging","name":"logging-common-base","uid":"a02a6423-2b84-4043-888c-b4443c17d404"}]},"spec":{"ports":[{"port":24240,"protocol":"TCP","targetPort":24240}],"selector":{"app.kubernetes.io/managed-by":"logging-common-base","app.kubernetes.io/name":"fluentd"},"type":"ClusterIP"},"status":{"loadBalancer":{}}}'
+  labels:
+    app.kubernetes.io/managed-by: logging-common-base
+    app.kubernetes.io/name: fluentd
+  name: logging-common-base-fluentd
+  namespace: system
+spec:
+  ports:
+  - port: 24240
+    protocol: TCP
+    targetPort: 24240
+  selector:
+    app.kubernetes.io/managed-by: logging-common-base
+    app.kubernetes.io/name: fluentd
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    banzaicloud.com/last-applied: '{"metadata":{"labels":{"app.kubernetes.io/managed-by":"logging-common-base","app.kubernetes.io/name":"fluentd"},"name":"logging-common-base-fluentd-metrics","namespace":"system","ownerReferences":[{"apiVersion":"logging.banzaicloud.io/v1beta1","controller":true,"kind":"Logging","name":"logging-common-base","uid":"a02a6423-2b84-4043-888c-b4443c17d404"}]},"spec":{"clusterIP":"None","ports":[{"name":"metrics","port":24231,"protocol":"TCP","targetPort":24231}],"selector":{"app.kubernetes.io/managed-by":"logging-common-base","app.kubernetes.io/name":"fluentd"},"type":"ClusterIP"},"status":{"loadBalancer":{}}}'
+  labels:
+    app.kubernetes.io/managed-by: logging-common-base
+    app.kubernetes.io/name: fluentd
+  name: logging-common-base-fluentd-metrics
+  namespace: system
+spec:
+  clusterIP: None
+  ports:
+  - name: metrics
+    port: 24231
+    protocol: TCP
+    targetPort: 24231
+  selector:
+    app.kubernetes.io/managed-by: logging-common-base
+    app.kubernetes.io/name: fluentd
+  type: ClusterIP

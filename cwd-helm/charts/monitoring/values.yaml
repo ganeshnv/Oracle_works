@@ -1,0 +1,374 @@
+global:
+  imagePullSecrets:
+    - name: dataservicedev1-ocir
+
+vaultAgent:
+  enabled: true
+
+ssl:
+  enabled: false
+  name:
+  tls_crt:
+  tls_key:
+
+## PROMETHEUS-OPERATOR
+# https://github.com/helm/charts/tree/master/stable/prometheus-operator
+prometheus-operator:
+  # after change this, service account also got changed and we have to update vault. To be safe, comment it out now.
+  #fullnameOverride: "operator"
+  enabled: true
+
+  prometheusOperator:
+    createCustomResource: false
+    # Remove CRDs before instaling, created for use on CI environment.
+    cleanupCustomResourceBeforeInstall: false
+    ## Attempt to clean up CRDs created by Prometheus Operator.
+    ##
+#    cleanupCustomResource: false
+
+    tlsProxy:
+      enabled: true
+      image:
+        repository: iad.ocir.io/dataservicedev1/squareup/ghostunnel
+        tag: v1.4.1
+    admissionWebhooks:
+      # For now, disable admission webhooks as they dont support image pull
+      # secrets.
+      # The webhooks cause timeout on helm install
+      # https://github.com/helm/helm/issues/6130#issuecomment-537829666
+      enabled: true
+      patch:
+        image:
+          repository: iad.ocir.io/dataservicedev1/jettech/kube-webhook-certgen
+          tag: v1.0.0
+    image:
+      repository: iad.ocir.io/dataservicedev1/quay-io/coreos/prometheus-operator
+      tag: v0.34.0
+    configmapReloadImage:
+      repository: iad.ocir.io/dataservicedev1/quay-io/coreos/configmap-reload
+      tag: v0.0.1
+    prometheusConfigReloaderImage:
+      repository: iad.ocir.io/dataservicedev1/quay-io/coreos/prometheus-config-reloader
+      tag: v0.34.0
+    hyperkubeImage:
+      repository: iad.ocir.io/dataservicedev1/k8s-gcr-io/hyperkube
+      tag: v1.12.1
+    configReloaderCpu: 400m
+    configReloaderMemory: 256Mi
+
+  prometheus:
+    ingress:
+      enabled: false
+#      annotations:
+#        nginx.ingress.kubernetes.io/rewrite-target: /$2
+#      hosts: null
+#      paths: ["/prometheus(/|$)(.*)"]
+    prometheusSpec:
+      thanos:
+        image: iad.ocir.io/dataservicedev1/quay-io/thanos/thanos:v0.14.0
+        version: v0.14.0
+        objectStorageConfig:
+          name: monitoring-thanos
+          key: object-store.yaml
+
+      image:
+        repository: iad.ocir.io/dataservicedev1/quay-io/prometheus/prometheus
+        tag: v2.13.1
+
+      logLevel: warn
+      # My english teacher never told me about double-negatives
+      ruleNamespaceSelector:
+        matchExpressions:
+          - { key: imposible-key, operator: DoesNotExist }
+      ruleSelector:
+        matchExpressions:
+          - { key: imposible-key, operator: DoesNotExist }
+      serviceMonitorNamespaceSelector:
+        matchExpressions:
+          - { key: imposible-key, operator: DoesNotExist }
+      serviceMonitorSelector:
+        matchExpressions:
+          - { key: imposible-key, operator: DoesNotExist }
+      configMaps:
+      - vault-agent-config
+      containers:
+      - name: vault-agent-auth
+        image: iad.ocir.io/dataservicedev1/library/vault:1.2.3
+        securityContext:
+          runAsUser: 65534
+        volumeMounts:
+          - name: configmap-vault-agent-config
+            mountPath: /etc/vault
+          - name: config-out
+            mountPath: /home/vault/config-out
+        env:
+          - name: VAULT_ADDR
+            value: "https://topsecret-vault.system-secret:8200"
+          - name: VAULT_SKIP_VERIFY
+            value: "true"
+        command: ["vault"]
+        args:
+          [
+            "agent",
+            "-config=/etc/vault/vault-agent-config.hcl",
+            "-log-level=debug",
+          ]
+#      externalUrl: "prometheus"
+      #      routePrefix: /
+      retention: 100d
+      storageSpec:
+        volumeClaimTemplate:
+          metadata:
+            name: db
+          spec:
+            storageClassName: oci
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 500Gi
+
+  alertmanager:
+    ingress:
+      enabled: false
+#      annotations:
+#        nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+#      hosts: null
+#      paths: ["/alertmanager(/|$)(.*)"]
+    alertmanagerSpec:
+      logLevel: warn
+      retention: 120h
+#      externalUrl: "http://<MY_LOAD_BALANCER>/...."
+#      routePrefix: /
+      image:
+        repository: iad.ocir.io/dataservicedev1/quay-io/prometheus/alertmanager
+        tag: v0.19.0
+      storage:
+        volumeClaimTemplate:
+          metadata:
+            name: db
+          spec:
+            storageClassName: oci
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 50Gi
+    config:
+      templates: ["*.tmpl"]
+      global:
+        resolve_timeout: 5m
+      route:
+        group_by: ['job']
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 12h
+        receiver: slack_alerts_testing
+        routes:
+          - receiver: slack_alerts_critical
+            match_re:
+              severity: error.*|critical.*
+          - receiver: slack_alerts_testing
+            match_re:
+              severity: info.*|warn.*
+          - receiver: 'null'
+            match:
+              alertname: Watchdog
+      receivers:
+        - name: 'null'
+        # https://prometheus.io/docs/alerting/configuration/#slack_config
+        # https://harthoover.com/pretty-alertmanager-alerts-in-slack/
+
+    tplConfig: false
+    templateFiles:
+      # https://github.com/prometheus/alertmanager/blob/master/template/default.tmpl
+      slack.tmpl: |-
+        {{ define "cluster" }}{{ .ExternalURL | reReplaceAll ".*alertmanager\\.(.*)" "$1" }}{{ end }}
+        {{ define "annotation_missing" -}} _{{ . }}_ annotation missing {{- end }}
+        {{ define "runbook_url" -}} <https://orahub.oci.oraclecorp.com/cc-cre-dev/cre-kube-deployment/runbooks/{{ . }}|:spiral_note_pad:> {{- end }}
+
+        {{ define "slack.detailed.title" -}}
+          [{{ .Status | toUpper -}} {{- if eq .Status "firing" }}: {{ .Alerts.Firing | len }} {{- end }}] {{- " " -}}
+          {{- range .Alerts -}}{{ .Labels.alertname }} {{ end }}
+        {{- end }}
+
+        {{ define "slack.detailed.text" }}
+        {{- $root := . -}}
+        {{ range .Alerts }}
+        *Summary:* `{{ .Labels.severity }}` {{- " - " -}}
+        {{- if .Annotations.summary -}}
+          {{ .Annotations.summary }}
+        {{- else -}}
+          {{ template "annotation_missing" "summary" }}
+        {{- end }}
+        *Cluster:* {{ template "cluster" $root }} {{- " • " -}}
+        *Graph:* <{{ .GeneratorURL }}|:chart_with_upwards_trend:> {{- " • " -}}
+        *Runbook:* {{- " " -}}
+        {{- if .Annotations.runbook -}}
+          <{{ .Annotations.runbook }}|:spiral_note_pad:>
+        {{- else if .Annotations.runbook_url -}}
+          <{{ .Annotations.runbook_url }}|:spiral_note_pad:>
+        {{- else if .Annotations.runbook_confluence -}}
+          {{ template "runbook_url" .Annotations.runbook_confluence }}
+        {{- else -}}
+          {{ template "runbook_url" "README.md" }}
+        {{- end }}
+        *Description:* {{- " " -}}
+        {{- if .Annotations.message -}}
+          {{ .Annotations.message }}
+        {{- else if .Annotations.description -}}
+          {{ .Annotations.description }}
+        {{- else -}}
+          {{ template "annotation_missing" "message" }}
+        {{- end }}
+        *Labels:*
+        {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+        {{ end }}
+        {{ end }}
+        {{ end }}
+
+
+  grafana:
+    grafana.ini:
+      server:
+        # root_url: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+        enable_gzip: "true"
+      auth.ldap:
+        enabled: true
+        allow_sign_up: true
+
+    image:
+      repository: iad.ocir.io/dataservicedev1/grafana/grafana
+      tag: 6.6.2
+      pullSecrets:
+        - "dataservicedev1-ocir"
+    sidecar:
+      image: iad.ocir.io/dataservicedev1/kiwigrid/k8s-sidecar:0.1.20
+      dashboards:
+        enabled: true
+        searchNamespace: ALL
+        label: grafana_dashboard
+      datasources:
+        enabled: true
+        searchNamespace: ALL
+        label: grafana_datasource
+    initChownData:
+      image:
+        repository: iad.ocir.io/dataservicedev1/library/busybox
+        tag: "1.31"
+    ingress:
+      enabled: false
+    persistence:
+      enabled: true
+      size: 500Gi
+      storageClassName: oci
+#      annotations:
+#        nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+#      hosts:
+#        -
+#      path: "/grafana(/|$)(.*)"
+    ldap:
+      enabled: true
+      existingSecret: ""
+      config: |-
+        [[servers]]
+        host = "ldap.oracle.com"
+        port = 389
+        use_ssl = false
+        start_tls = false
+        search_filter = "(mail=%s)"
+        search_base_dns = ["dc=oracle,dc=com"]
+
+        [servers.attributes]
+        name = "givenName"
+        surname = "sn"
+        username = "cn"
+        member_of = "memberOf"
+        email = "mail"
+  
+
+  # OKE uses core dns from 1.14.8 and newer
+  # we don't have to monitor on kube-system as it's managed by OKE and they are monitored by OKE service already.
+  coreDns:
+    enabled: false
+  kubeDns:
+    enabled: false
+  kubeEtcd:
+    enabled: false
+  kubeScheduler:
+    enabled: false
+  # kube-controller-manager is managed by oke controlplane, we don't scrape it.
+  kubeControllerManager:
+    enabled: false
+  # kube-proxy port is 10256 as configured by OKE, but metrics not exposed from the pod
+  kubeProxy:
+    enabled: false
+
+  prometheus-node-exporter:
+    image:
+      repository: iad.ocir.io/dataservicedev1/quay-io/prometheus/node-exporter
+      tag: v0.18.0
+    service:
+      port: 9200
+
+  kube-state-metrics:
+    image:
+      repository: iad.ocir.io/dataservicedev1/quay-io/coreos/kube-state-metrics
+      tag: v1.8.0
+    imagePullSecrets:
+      - name: dataservicedev1-ocir
+
+## thanos
+# https://github.com/banzaicloud/banzai-charts/tree/master/thanos
+thanos:
+  enabled: false
+  image:
+    repository: iad.ocir.io/dataservicedev1/quay-io/thanos/thanos
+    tag: v0.14.0
+  query:
+    ruleDNSDiscovery: false
+    replicaLabels:
+      - "prometheus_replica"
+  compact:
+    dataVolume:
+      backend:
+        persistentVolumeClaim:
+          claimName: compact-data-volume
+    persistentVolumeClaim:
+      name: compact-data-volume
+      spec:
+        storageClassName: "oci"
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 100Gi
+  store:
+    dataVolume:
+      backend:
+        persistentVolumeClaim:
+          claimName: store-data-volume
+    persistentVolumeClaim:
+      name: store-data-volume
+      spec:
+        storageClassName: "oci"
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 100Gi
+  objstore:
+    type: S3
+    config:
+      bucket: ""
+      endpoint: ""
+      region: ""
+      access_key: ""
+      secret_key: ""
+      insecure: false
+      signature_version2: false
+      encrypt_sse: false
+      put_user_metadata: {}
+      http_config:
+        idle_conn_timeout: 0s
+        response_header_timeout: 0s
+        insecure_skip_verify: false
+      trace:
+        enable: false
+      part_size: 0

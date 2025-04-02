@@ -1,0 +1,15 @@
+controlNamespace: ""
+enableRecreateWorkloadOnImmutableFieldChange: false
+flowConfigCheckDisabled: false
+flowConfigOverride: ""
+fluentbit: {}
+fluentd: {}
+fullnameOverride: ""
+loggingRef: ""
+nameOverride: ""
+tls:
+  enabled: true
+  fluentbitSecretName: ""
+  fluentdSecretName: ""
+  sharedKey: ""
+watchNamespaces: []

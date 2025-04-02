@@ -1,0 +1,309 @@
+# Default values for oauth2-proxy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: iad.ocir.io/cwdinfradev/infra/oauth2-proxy
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "idcs_prod"
+  ldapTag: "idcs_prod"
+
+imagePullSecrets:
+  - name: ocirsecret
+nameOverride: ""
+fullnameOverride: ""
+
+extraLabels:
+  common-logging-flow: enabled
+podAnnotations:
+  vault.security.banzaicloud.io/vault-role: "cwd-production_apps_cloudwatchdog"
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+portal:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    name: portal
+    port: 4180
+  container:
+    port: 4180
+  config:
+    provider: oracle
+    emailDomain: oracle.com
+    upstream: http://tpaas-server-ui:19002
+    scope: cwd-prodcwd-prod.cwd
+    # clientId and clientSecret are the same for portal/api/cwd
+    clientId: fb50bc562caa478c802636ddca4acce7
+    clientSecret: 67d75c35-3123-4337-a555-1b6275d3cb5f
+    redirectUrl: https://tpaas.ocws.us-ashburn-1.oci.oraclecloud.com/login/oauth2/oracle
+    httpAddress: 0.0.0.0:4180
+    cookieSecure: false
+    cookieSecret: ShY9SPpOhd0QOcVaKkPGKQ==
+    cookieExpire: 3h
+api:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 4180
+  container:
+    port: 4180
+  config:
+    provider: oracle
+    emailDomain: oracle.com
+    upstream: http://tpaas-server-api:19000
+    scope: cwd-prodcwd-prod.cwd
+    clientId: fb50bc562caa478c802636ddca4acce7
+    clientSecret: 67d75c35-3123-4337-a555-1b6275d3cb5f
+    redirectUrl: https://tpaas.ocws.us-ashburn-1.oci.oraclecloud.com/login/oauth2/oracle
+    httpAddress: 0.0.0.0:4180
+    cookieSecure: false
+    cookieSecret: ShY9SPpOhd0QOcVaKkPGKQ==
+    cookieExpire: 3h
+reportServer:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 4180
+  container:
+    port: 4180
+  config:
+    provider: oracle
+    emailDomain: oracle.com
+    upstream: http://tpaas-server-report-server:18081
+    scope: cwd-prodcwd-prod.cwd
+    clientId: fb50bc562caa478c802636ddca4acce7
+    clientSecret: 67d75c35-3123-4337-a555-1b6275d3cb5f
+    redirectUrl: https://tpaas.ocws.us-ashburn-1.oci.oraclecloud.com/login/oauth2/oracle
+    httpAddress: 0.0.0.0:4180
+    cookieSecure: false
+    cookieSecret: ShY9SPpOhd0QOcVaKkPGKQ==
+    cookieExpire: 3h
+webshell:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 4180
+  container:
+    port: 4180
+  config:
+    provider: oracle
+    emailDomain: oracle.com
+    upstream: http://tpaas-server-webshell:18090
+    scope: cwd-prodcwd-prod.cwd
+    clientId: fb50bc562caa478c802636ddca4acce7
+    clientSecret: 67d75c35-3123-4337-a555-1b6275d3cb5f
+    redirectUrl: https://tpaas.ocws.us-ashburn-1.oci.oraclecloud.com/login/oauth2/oracle
+    httpAddress: 0.0.0.0:4180
+    cookieSecure: false
+    cookieSecret: ShY9SPpOhd0QOcVaKkPGKQ==
+    cookieExpire: 3h
+cwd:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 4180
+  container:
+    port: 4180
+  config:
+    provider: oracle
+    emailDomain: oracle.com
+    scope: cwd-prodcwd-prod.cwd
+    clientId: fb50bc562caa478c802636ddca4acce7
+    clientSecret: 67d75c35-3123-4337-a555-1b6275d3cb5f
+    redirectUrl: https://portal.ocws.us-ashburn-1.oci.oraclecloud.com/login/oauth2/oracle
+    httpAddress: 0.0.0.0:4180
+    cookieSecure: false
+    cookieSecret: ShY9SPpOhd0QOcVaKkPGKQ==
+    whitelistDomains: portal.ocws.us-ashburn-1.oci.oraclecloud.com
+    cookieExpire: 3h
+    profileUrl: http://cwd-ldap:9000/api/v1/ldap/userId/groups
+    internal:
+      scope: cwd-prod-internalcwd-prod.cwd
+      redirectUrl: https://portal-internal.ocws.us-ashburn-1.oci.oraclecloud.com/login/oauth2/oracle
+      clientId: 7e19dfe82fec403394bed65f2a8bc40c
+      clientSecret: 7bdb1fd4-76e5-4c4b-a0f0-3e29d6c0a467
+      whitelistDomains: portal-internal.ocws.us-ashburn-1.oci.oraclecloud.com
+  nginx:
+    replicaCount: 2
+    image:
+      repository: "iad.ocir.io/dataservicedev1/nginx"
+      tag: "1.14.2"
+      pullPolicy: IfNotPresent
+    service:
+      type: ClusterIP
+      port: 80
+    container:
+      port: 80
+    config:
+      host: p2e0ndwvcxvqb9x-prodcwd.adb.us-ashburn-1.oraclecloudapps.com
+  internal:
+    nginx:
+      config:
+        host: p2e0ndwvcxvqb9x-internalcwd.adb.us-ashburn-1.oraclecloudapps.com
+
+
+ingress:
+  ssl:
+    enabled: true
+    name: oauth2-proxy
+    tls_crt: |-
+      -----BEGIN CERTIFICATE-----
+      MIIH4TCCBsmgAwIBAgIQDhYNO+hiui0lFlZhebGziTANBgkqhkiG9w0BAQsFADBP
+      MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMSkwJwYDVQQDEyBE
+      aWdpQ2VydCBUTFMgUlNBIFNIQTI1NiAyMDIwIENBMTAeFw0yNDA3MDkwMDAwMDBa
+      Fw0yNTA4MDgyMzU5NTlaMIGGMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZv
+      cm5pYTEVMBMGA1UEBxMMUmVkd29vZCBDaXR5MRswGQYDVQQKExJPcmFjbGUgQ29y
+      cG9yYXRpb24xLjAsBgNVBAMTJW9jd3MudXMtYXNoYnVybi0xLm9jaS5vcmFjbGVj
+      bG91ZC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDc/yRAzboi
+      MiLkT7XFtWh2ulU8BwppTf7yo8MqCyY4fPUHpsvsF7yWE/7fdGraIzMfVAwaDb5j
+      mKDIXH63KgLlV+ttF3/0DPd9eQJSAFT4GP0aeDhvHtWQ21q5M2zR/JvuHAg8phIN
+      quDB1T50OY85v26HsX+SAwOQngekNeNiMCaxVVbExlMC6+5FitPzbDNWFxDykp1g
+      EGfFnSJmst7zMSdfVEW8r0zm030JGU1mwSiwTxWiVjxEUB8d8x0+A1mFrqbH2NMX
+      Y12qapd0BcmUPucdeYJ/4QON0IB7rYOxHJY9jGy01VPo01nDb5+ppisIoPLYG/Yd
+      mDwyXr2KF9lFAgMBAAGjggR/MIIEezAfBgNVHSMEGDAWgBS3a6LqqKqEjHnqtNoP
+      mLLFlXa59DAdBgNVHQ4EFgQUQj64liVAnlpSXGO3qj25eVhZqBMwggEkBgNVHREE
+      ggEbMIIBF4Ilb2N3cy51cy1hc2hidXJuLTEub2NpLm9yYWNsZWNsb3VkLmNvbYIr
+      dHBhYXMub2N3cy51cy1hc2hidXJuLTEub2NpLm9yYWNsZWNsb3VkLmNvbYIscG9y
+      dGFsLm9jd3MudXMtYXNoYnVybi0xLm9jaS5vcmFjbGVjbG91ZC5jb22CMHByb21l
+      dGhldXMub2N3cy51cy1hc2hidXJuLTEub2NpLm9yYWNsZWNsb3VkLmNvbYItZ3Jh
+      ZmFuYS5vY3dzLnVzLWFzaGJ1cm4tMS5vY2kub3JhY2xlY2xvdWQuY29tgjJhbGVy
+      dG1hbmFnZXIub2N3cy51cy1hc2hidXJuLTEub2NpLm9yYWNsZWNsb3VkLmNvbTA+
+      BgNVHSAENzA1MDMGBmeBDAECAjApMCcGCCsGAQUFBwIBFhtodHRwOi8vd3d3LmRp
+      Z2ljZXJ0LmNvbS9DUFMwDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUF
+      BwMBBggrBgEFBQcDAjCBjwYDVR0fBIGHMIGEMECgPqA8hjpodHRwOi8vY3JsMy5k
+      aWdpY2VydC5jb20vRGlnaUNlcnRUTFNSU0FTSEEyNTYyMDIwQ0ExLTQuY3JsMECg
+      PqA8hjpodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vRGlnaUNlcnRUTFNSU0FTSEEy
+      NTYyMDIwQ0ExLTQuY3JsMH8GCCsGAQUFBwEBBHMwcTAkBggrBgEFBQcwAYYYaHR0
+      cDovL29jc3AuZGlnaWNlcnQuY29tMEkGCCsGAQUFBzAChj1odHRwOi8vY2FjZXJ0
+      cy5kaWdpY2VydC5jb20vRGlnaUNlcnRUTFNSU0FTSEEyNTYyMDIwQ0ExLTEuY3J0
+      MAwGA1UdEwEB/wQCMAAwggF/BgorBgEEAdZ5AgQCBIIBbwSCAWsBaQB3ABLxTjS9
+      U3JMhAYZw48/ehP457Vih4icbTAFhOvlhiY6AAABkJhWswoAAAQDAEgwRgIhAOmB
+      FVqYhCylA+p61TkOU0IN6/DJhiclADRR9VaNn1bkAiEAy5do7qbbl+6oHcU2+1fC
+      p1KZKu8Rlizbn1L4ANe1id0AdgB9WR4S4XgqexxhZ3xe/fjQh1wUoE6VnrkDL9kO
+      jC55uAAAAZCYVrLTAAAEAwBHMEUCIQD7o71SCJtyVi0dBMQYEjDSXiEZPXpg874u
+      fo/PtYX9tAIgOlj8Ico23sSqYO6eEbq1f56RRVEo7fpozrl6zhNXt1QAdgDm0jFj
+      QHeMwRBBBtdxuc7B0kD2loSG+7qHMh39HjeOUAAAAZCYVrMJAAAEAwBHMEUCIEuw
+      ldSVduUlYAl+jdK/pussMiou+9WzRA7vfu4wh2foAiEAyShLgKvbRq/GjwmkeQ5M
+      bsljdCaGIj/rBAIXJKVa734wDQYJKoZIhvcNAQELBQADggEBALzbFDyJpd3CqHxJ
+      Wmqrj3llusSWMmJSamv+K22no/5y8VP7/0FziTNy8EyE2MJlgswIUZtBeyoToGYL
+      zJWUwsjO1RBbRMByLZXIAuYj1vr3+94/h79A3f7TOmddhruGr1pW9CfZS7mojmKw
+      PwgzP/HaR06l628owzfM29+Nge/bmNKFmVOgeADxV34syJ1mi4HMmEQJky9bTwHl
+      SeVCfW7tGJYfnVKv1LTdfeul8T49RcseiX7BXYly9hzoIGkY5jKuJRcIsvUhehil
+      4Cn/PUoOYvU2ispGR2lsrgCXQq3CQNbIeulzqEfmYVv575ZempqNDcYIlVY3drKI
+      xBftmeI=
+      -----END CERTIFICATE-----
+    tls_key: |-
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEowIBAAKCAQEA3P8kQM26IjIi5E+1xbVodrpVPAcKaU3+8qPDKgsmOHz1B6bL
+      7Be8lhP+33Rq2iMzH1QMGg2+Y5igyFx+tyoC5VfrbRd/9Az3fXkCUgBU+Bj9Gng4
+      bx7VkNtauTNs0fyb7hwIPKYSDargwdU+dDmPOb9uh7F/kgMDkJ4HpDXjYjAmsVVW
+      xMZTAuvuRYrT82wzVhcQ8pKdYBBnxZ0iZrLe8zEnX1RFvK9M5tN9CRlNZsEosE8V
+      olY8RFAfHfMdPgNZha6mx9jTF2NdqmqXdAXJlD7nHXmCf+EDjdCAe62DsRyWPYxs
+      tNVT6NNZw2+fqaYrCKDy2Bv2HZg8Ml69ihfZRQIDAQABAoIBAQDSE+wHeklVVmma
+      tTcrEU6Thn+dx2ebQNx5FTliDyUvD4Hx2xoAfXP1Cl7/VfB5GnrvbfrvDV+N17oH
+      nP2L6nDESTZwBqXIfkcJzG1rPAuJqF95uQyUfTAxOoPch8kLOGGWEKm31XpV6bks
+      KSTsYQcIszRD43RMfXb3E3JaJCvZ2f090TNnEd4VF24FERTLTLHRCIF5n9I9jQTg
+      q1DblfXznGNTKSZ4Rdgb3r9QBzQsSRWEMneKttf64+K5wvgwsNOHD3wdiiZQb5hk
+      Tp7nqGVgJk+0Xz8d5ETlwS/IwdWpmouBsyD9aYsSbao5Era9HtttoDBttMZ5mJ9M
+      5I8HGAYhAoGBAPm77fNUr24OEs/7WMaJoWndxvEulBO5SnBWr3tqO24DFUGfN+xy
+      1VPsryGWDc38sL+hVL4AqNoWe9mJgZpc0Dj4agcpJ7ryzC/1rIFplGcrYj+CfgKi
+      HtSFtz4c9cj45+OusauRAVh5oU/ADgdLnNg+PP7V9r0L+DK2UrVXqU/9AoGBAOKK
+      oNFjEw5EPG3rlrEXBsO+Kxb5t4oLXrRNZoO0cv80b4QiPrx4iw2zeOp4t7XBtWAq
+      PhvDfpnyPwGR1uPQOGoxi9TViVBH1vqaroxcQqAhw/zZJ7EsEgOpsoOrdXdwBLa3
+      LgM1tYwdpz1ONdZAtvfmpq2pxIYtPzQtXDcolfzpAoGAKWvIPdHP/xsKd8Ciqttt
+      EFgehSZKnTLga92U4Y1vKgIM5oN4DRnG1FKvgYyX4ZCF6GLj4VfOqc2M4Tnzaxz1
+      1F0viNyEoHdg8pt270gJu0rw0sPcDqfBIVLEX+MByUGvhI4XHfPBG2GhJc8fBIrA
+      CwXXrBTlBdoUYqTm9vkBNikCgYBPHQiSdx4FgnD0Fi0XBSqYm0XjDSw6qkPVhZ5C
+      ancqhr5XD7qHCTXOgBm/EI9fixlzTu1Httr0mjPEsZCxGFtLQqhJmJUOkzgRZomE
+      fQfLcl9GYvPInNJhsxajgvJP1q/eu1P3TP9swkJQV4rXmtwK8OLOjRYToaOL7jdh
+      D+xpWQKBgGerrZZ8ZX7SRX0QbGzGoiBRdWeit8V8SCLBA1z6fwVwg9zFPFR9X2FF
+      D2VtuwoG7eNl7/s/BcahOkXwwFeeIbegxNTGUBxJjFG0bwkobfLa3PvUkA6Kug6j
+      /w2Gh3de72UsCz9a8HTPslgnqqVbUGvFKmn403CxIbVk6VzxsZ5Y
+      -----END RSA PRIVATE KEY-----      
+  enabled: true
+  annotations:
+    reportServer:
+      path:
+        nginx.ingress.kubernetes.io/affinity: "cookie"
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+        nginx.ingress.kubernetes.io/rewrite-target: /$1/$2
+    webshell:
+      path:
+        nginx.ingress.kubernetes.io/affinity: "cookie"
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+        nginx.ingress.kubernetes.io/rewrite-target: /$1$2
+    path:
+      nginx.ingress.kubernetes.io/rewrite-target: /$1
+      nginx.ingress.kubernetes.io/affinity: "cookie"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    cwd:
+      rootPath:
+        nginx.ingress.kubernetes.io/rewrite-target: /ords/r/watchdog/cloudwatchdog/compute-based
+        nginx.ingress.kubernetes.io/affinity: "cookie"
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      legacyPath:
+        nginx.ingress.kubernetes.io/permanent-redirect: https://portal.ocws.us-ashburn-1.oci.oraclecloud.com/ords/r/watchdog/cloudwatchdog/compute-based
+        nginx.ingress.kubernetes.io/affinity: "cookie"
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  hosts:
+    - host: ocws.us-ashburn-1.oci.oraclecloud.com
+      paths: []
+  portal:
+    hostname: tpaas.ocws.us-ashburn-1.oci.oraclecloud.com
+  api:
+    hostname: tpaas.ocws.us-ashburn-1.oci.oraclecloud.com
+  cwd:
+    hostname: portal.ocws.us-ashburn-1.oci.oraclecloud.com
+    # if no need the proxy for legacy CWD, just leave the hostname as empty
+    legacy:
+      hostname:
+    internal:
+      hostname: portal-internal.ocws.us-ashburn-1.oci.oraclecloud.com
+  reportServer:
+    hostname: tpaas.ocws.us-ashburn-1.oci.oraclecloud.com
+  webshell:
+    hostname: tpaas.ocws.us-ashburn-1.oci.oraclecloud.com
+  tls:
+    - secretName: tpaas-server
+      hosts:
+        - "portal.ocws.us-ashburn-1.oci.oraclecloud.com"
+        - "tpaas.ocws.us-ashburn-1.oci.oraclecloud.com"
+  tlsInternal:
+    #{{ .Values.ingress.ssl.name }}-cwd
+    - secretName: oauth2-proxy-cwd-internal
+      hosts:
+        - "portal-internal.ocws.us-ashburn-1.oci.oraclecloud.com"
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

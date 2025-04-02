@@ -1,0 +1,15 @@
+repositories:
+  - name: stable
+    url: https://charts.helm.sh/stable
+  - name: elasticsearch
+    url: https://helm.elastic.co
+
+environments:
+  {{ .Environment.Name }}: {}
+
+releases:
+  - name: infra-elastic
+    namespace: cwd-apps
+    chart: .
+    values:
+    - ../../environments/{{ .Environment.Name }}/elastic.yaml

@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cwd-coordinator
+spec:
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+{{- include "cwd-coordinator.selectorLabels" . | nindent 6 }}
+  endpoints:
+    - port: http
+      path: '/prometheus'

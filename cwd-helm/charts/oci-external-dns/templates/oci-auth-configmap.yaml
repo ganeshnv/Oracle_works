@@ -1,0 +1,44 @@
+---
+{{/* https://github.com/banzaicloud/bank-vaults/blob/35e3ac4484fe1097d87cbc0858f6a5bdcc08b657/docs/mutating-webhook/consul-template.md */}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "oci-external-dns.fullname" $ }}-oci-yaml
+  labels:
+    {{- include "oci-external-dns.labels" . | nindent 4 }}
+data:
+  config.hcl: |
+    auto_auth {
+      method "kubernetes" {
+        config = {
+          role = "{{ .Values.vaultAuthRole }}"
+        }
+      }
+      sink "file" {
+        config = {
+          path = "/home/vault/.token"
+        }
+      }
+    }
+    vault = {
+      address = "https://topsecret-vault.system-secret:8200"
+      tls_skip_verify = true
+    }
+
+    template {
+      destination = "/vault/secrets/oci.yaml"
+      # command is useful for debugging, but exposes the secrets in logs, so don't leave it.
+      # command  = "/bin/sh -c 'cat /vault/secrets/oci.yaml'"
+      contents = <<-EOH
+        compartment: {{ required "A valid compartmentId value is required." .Values.compartmentId }}
+        auth:
+          region: {{ required "A valid region value is required." .Values.region }}
+          tenancy: {{ required "A valid tenancyId value is required." .Values.tenancyId  }}
+          user: {{ required "A valid ociUserId value is required." .Values.ociUserId }}
+          {{`{{- with secret`}} "{{ .Values.vaultSecretPath }}" {{`}}`}}
+          fingerprint: {{ .Values.ociUserFingerprintVaultTmpl }}
+          key: |
+      {{ .Values.ociUserPrivateKeyVaultTmpl }}
+          {{`{{ end }}`}}
+      EOH
+    }

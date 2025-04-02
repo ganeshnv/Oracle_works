@@ -1,0 +1,127 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "oauth2-proxy-tpaas-ui-name" . }}
+  labels:
+    {{- include "oauth2-proxy-tpaas-ui.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.portal.service.type }}
+  ports:
+    - port: {{ .Values.portal.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "oauth2-proxy-tpaas-ui.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "oauth2-proxy-tpaas-api-name" . }}
+  labels:
+    {{- include "oauth2-proxy-tpaas-api.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.api.service.type }}
+  ports:
+    - port: {{ .Values.api.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "oauth2-proxy-tpaas-api.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "oauth2-proxy-cwd-name" . }}
+  labels:
+    {{- include "oauth2-proxy-cwd.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.cwd.service.type }}
+  ports:
+    - port: {{ .Values.cwd.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "oauth2-proxy-cwd.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "oauth2-proxy-cwd-nginx-name" . }}
+  labels:
+    {{- include "oauth2-proxy-cwd-nginx.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.cwd.nginx.service.type }}
+  ports:
+    - port: {{ .Values.cwd.nginx.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "oauth2-proxy-cwd-nginx.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "oauth2-proxy-tpaas-report-server-name" . }}
+  labels:
+    {{- include "oauth2-proxy-tpaas-report-server.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.reportServer.service.type }}
+  ports:
+    - port: {{ .Values.reportServer.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "oauth2-proxy-tpaas-report-server.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "oauth2-proxy-tpaas-webshell-name" . }}
+  labels:
+    {{- include "oauth2-proxy-tpaas-webshell.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.webshell.service.type }}
+  ports:
+    - port: {{ .Values.webshell.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "oauth2-proxy-tpaas-webshell.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "oauth2-proxy-cwd-internal-name" . }}
+  labels:
+    {{- include "oauth2-proxy-cwd-internal.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.cwd.service.type }}
+  ports:
+    - port: {{ .Values.cwd.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "oauth2-proxy-cwd-internal.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "oauth2-proxy-cwd-internal-nginx-name" . }}
+  labels:
+    {{- include "oauth2-proxy-cwd-internal-nginx.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.cwd.nginx.service.type }}
+  ports:
+    - port: {{ .Values.cwd.nginx.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "oauth2-proxy-cwd-internal-nginx.selectorLabels" . | nindent 4 }}

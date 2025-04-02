@@ -1,0 +1,54 @@
+# Default values for cwd-coordinator.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 3
+
+image:
+  repository: cwd-dev-docker-local.artifactory.oci.oraclecorp.com/cwd-coordinator
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart version.
+  tag: "0.2.10-release-internal-SNAPSHOT"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podExtraAnnotations:
+  vault.security.banzaicloud.io/vault-role: "cwd-staging_apps_cloudwatchdog"
+
+podExtraLabels:
+  common-logging-flow: enabled
+
+workflow:
+  overlayMode: false
+  locationOverride:
+    region: "IAD"
+    availabilityDomain: "IAD_AD_1"
+  ociAd: "ad1"
+  ociIaasDomainName: "us-ashburn-1.oracleiaas.com"
+  domainId: "cwdwf-internal"
+
+cwdDb:
+  username: watchdog
+  password: vault:secret/data/cwd-staging/apps/cloudwatchdog/coordinator_internal#PWD
+  walletMountLocation: /etc/atp/wallet
+  dbOcid: "ocid1.autonomousdatabase.oc1.iad.abuwcljrmp2ot27bg6vy4ktefeoofsf3o5v6afwtcapnmm5upm4e52whnsna"
+  serviceName: "qalab_tp"
+
+tpaas:
+  server: http://tpaas-server-api.staging:19000
+  reportServer: http://tpaas-server-report-server.staging:18081
+  authToken: "vault:secret/data/cwd-staging/apps/cloudwatchdog/coordinator#TPAAS_AUTH_TOKEN"
+  postVersion: "v3"
+  getVersion: "v1"
+  overviewServiceTags: "smoketest,smoketest(oci),vpnaaslifecycle,compapihealth,complaunchhealth"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""

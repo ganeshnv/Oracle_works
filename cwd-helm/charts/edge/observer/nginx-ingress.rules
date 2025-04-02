@@ -1,0 +1,20 @@
+groups:
+  - name: inginx-ingress
+    rules:
+      - alert: nginxTooMany500s
+        expr: sum(rate(nginx_ingress_controller_requests{status=~"5.+"} [30m] ) )/ sum(rate(nginx_ingress_controller_requests [30m]) ) * 100 > 5 
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "More than 5% of the all requests did return 5XX, this require your attention"
+          description: "Too many 5XXs"
+
+      - alert: nginxExpiringCert
+        expr: avg(nginx_ingress_controller_ssl_expire_time_seconds) by (ingress, host) - time() < 60*60*24*15
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Expiring ingress certificates"
+          description: "A certificate(s) has less than 15 days before expiring"

@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "cwd-ldap-internal-properties-name" . }}
+  labels:
+  {{- include "cwd-ldap-internal.labels" . | nindent 4 }}
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  SERVER_PORT: {{ .Values.container.port | quote}}
+  SPRING_DATASOURCE_URL: {{ printf "jdbc:oracle:thin:@%s?TNS_ADMIN=/workspace/CWD/wallet"  .Values.cwd.ldap.db.dbName | quote  }}
+  CWD_LDAP_LDAPSERVICE_PROVIDERURL: {{ .Values.cwd.ldap.LdapService.providerUrl | quote }}
+  CWD_LDAP_LDAPSERVICE_SEARCHBASE: {{ .Values.cwd.ldap.LdapService.searchBase | quote }}
+  CWD_LDAP_LDAPSERVICE_ATTRIBUTENAME: {{ .Values.cwd.ldap.LdapService.attributeName | quote }}
+  CWD_LDAP_LDAPSERVICE_SEARCHFILTERKEY: {{ .Values.cwd.ldap.LdapService.searchFilterKey | quote }}
+  CWD_LDAP_LDAPSERVICE_SEARCHRESULTPATTERN: {{ .Values.cwd.ldap.LdapService.searchResultPattern | quote }}
+  CWD_LDAP_LDAPCONSUMER_PERIODMS: {{ .Values.cwd.ldap.LdapConsumer.periodMs | quote}}
+  CWD_LDAP_LDAPCONSUMER_GROUPS: {{ .Values.cwd.ldap.LdapConsumer.groups | quote }}
+  CWD_LDAP_FAILURETICKETSERVICE_CLOSEDSTATUSES: {{ .Values.cwd.ldap.FailureTicketService.closedStatuses | quote }}
+  CWD_LDAP_FAILURETICKETSERVICE_TICKETURL: {{ .Values.cwd.ldap.FailureTicketService.ticketURL | quote }}
+  CWD_LDAP_FAILURETICKETSERVICE_USERNAME: {{ .Values.cwd.ldap.FailureTicketService.username | quote }}
+  CWD_LDAP_FAILURETICKETCONSUMER_PERIODMS: {{ .Values.cwd.ldap.FailureTicketConsumer.periodMs | quote }}

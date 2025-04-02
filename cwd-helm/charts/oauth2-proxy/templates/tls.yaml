@@ -1,0 +1,25 @@
+{{- if .Values.ingress.ssl.enabled }}
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: {{ .Values.ingress.ssl.name }}
+  labels:
+{{ include "oauth2-proxy.labels" . | indent 4 }}
+data:
+  tls.crt: {{ .Values.ingress.ssl.tls_crt | b64enc }}
+  tls.key: {{ .Values.ingress.ssl.tls_key | b64enc }}
+{{- end }}
+---
+{{- if .Values.ingress.ssl.enabled }}
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: {{ .Values.ingress.ssl.name }}-cwd-internal
+  labels:
+{{ include "oauth2-proxy.labels" . | indent 4 }}
+data:
+  tls.crt: {{ .Values.ingress.ssl.cwdInternal.tls_crt | b64enc }}
+  tls.key: {{ .Values.ingress.ssl.cwdInternal.tls_key | b64enc }}
+{{- end }}

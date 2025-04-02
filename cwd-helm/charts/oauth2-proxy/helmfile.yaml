@@ -1,0 +1,17 @@
+helmDefaults:
+  wait: false
+  timeout: 600
+  force: false
+  recreatePods: false
+
+repositories: []
+
+environments:
+  {{ .Environment.Name }}: {}
+
+releases:
+ - name: oauth2-proxy
+   namespace: cwd-apps 
+   chart: .
+   values:
+   - ../../environments/{{ .Environment.Name }}/oauth2-proxy.yaml

@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "properties-name-api" . }}
+  namespace: {{ .Release.Namespace }}
+data:
+  application.properties: |-
+  {{- include "application-properties-api" . | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "properties-name-ui" . }}
+  namespace: {{ .Release.Namespace }}
+data:
+  application.properties: |-
+  {{- include "application-properties-ui" . | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "properties-name-interceptor" . }}
+  namespace: {{ .Release.Namespace }}
+data:
+  application.properties: |-
+  {{- include "application-properties-interceptor" . | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "properties-name-rate-limit" . }}
+  namespace: {{ .Release.Namespace }}
+data:
+  application.properties: |-
+  {{- include "application-properties-rate-limit" . | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "properties-name-webshell" . }}
+  namespace: {{ .Release.Namespace }}
+data:
+  webshell.json: |-
+  {{- include "application-properties-webshell" . | nindent 4 }}

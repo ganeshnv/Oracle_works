@@ -1,0 +1,32 @@
+logging-common-base:
+  enabled: true
+  fluentd:
+    metrics:
+      serviceMonitor: true
+  fluentbit:
+    metrics:
+      serviceMonitor: true
+    resources:
+      limits:
+        cpu: 400m
+        memory: 300M
+      requests:
+        cpu: 300m
+        memory: 200M
+
+    # In an OKE deployment, logs in:
+    # /var/log/containers/ (volume mounted here:
+    #    https://github.com/banzaicloud/logging-operator/blob/master/pkg/resources/fluentbit/daemonset.go#L121
+    # symlink to: /var/log/pods
+    # which then symlink to: /u01/data/docker/containers
+    extraVolumeMounts:
+      - source: /u01/data/docker/containers
+        destination: /u01/data/docker/containers
+        readOnly: true
+
+
+# Lumberjack UI: https://devops.oci.oraclecorp.com/logs
+#lumberjack:
+#  compartment: # When sending data to lumberjack, the ocid of the compartment the logs originated in.
+                # Not sure why it is needed by lumberjack, but it must be important.
+#  namespace:   # When search for logs in oci devops portal, they are scoped by tenancy id and namespace

@@ -1,0 +1,178 @@
+
+global:
+  imagePullSecrets: null
+#    - name: dataservicedev1-ocir
+
+observer:
+  enabled: true
+#  grafanaDirectory: observer
+#  grafanaDashboardFilePattern: "*.json"
+#  grafanaDashboardLabels:
+#    grafana_dashboard: "1"
+#  prometheusDirectory: observer
+#  prometheusRulesFilePattern: "*.rules"
+
+telepresence:
+  # Disabled because control-plane telepresence is now managed by CP init scrip.
+  enabled: false
+  image:
+    repository: iad.ocir.io/dataservicedev1/datawire/telepresence-k8s
+    tag: 0.101
+
+
+## NGINX-INGRESS
+# https://github.com/helm/charts/tree/master/stable/nginx-ingress
+# https://github.com/oracle/oci-cloud-controller-manager/blob/master/docs/load-balancer-annotations.md
+nginx-ingress:
+  enabled: true
+
+#  imagePullSecrets:
+#    - name: dataservicedev1-ocir
+  controller:
+    config:
+      hsts-preload: "true"
+    ingressClass: nginx
+    podLabels:
+      common-logging-flow: enabled
+
+    # Required for the nginx service's ip address to be assigned to the ingresses.
+    publishService:
+      enabled: true
+    service:
+      annotations:
+#        service.beta.kubernetes.io/oci-load-balancer-internal: "true"
+        service.beta.kubernetes.io/oci-load-balancer-security-list-management-mode: "None"
+      externalTrafficPolicy: Local
+      enableHttp: true
+    image:
+      repository: iad.ocir.io/dataservicedev1/quay-io/kubernetes-ingress-controller/nginx-ingress-controller
+      tag: "0.32.0"
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+    metrics:
+      enabled: true
+      prometheusRule:
+        enabled: false
+      serviceMonitor:
+        enabled: true
+  defaultBackend:
+    podLabels:
+      common-logging-flow: enabled
+    image:
+      repository: iad.ocir.io/dataservicedev1/kubernetes-ingress-controller/defaultbackend-amd64
+      tag: "1.5"
+
+# install CRD for k8s 1.15+ version
+# kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.0.2/cert-manager.crds.yaml
+cert-manager:
+  enabled: true
+  prometheus:
+    servicemonitor:
+      enabled: true
+  ingressShim:
+    defaultIssuerName: "selfsigning-issuer"
+    defaultIssuerKind: "ClusterIssuer"
+  # defaultACMEChallengeType: ""
+  # defaultACMEDNS01ChallengeProvider: ""
+
+  image:
+    repository: iad.ocir.io/dataservicedev1/quay-io/jetstack/cert-manager-controller
+    tag: v0.15.0
+
+  webhook:
+    enabled: false
+    image:
+      repository: iad.ocir.io/dataservicedev1/quay-io/jetstack/cert-manager-webhook
+      tag: v0.15.0
+  cainjector:
+    enabled: true
+    replicaCount: 1
+
+    extraArgs:
+    - --leader-elect=false
+
+    image:
+      repository: iad.ocir.io/dataservicedev1/quay-io/jetstack/cert-manager-cainjector
+      tag: v0.15.0
+
+certManagerPatches:
+  image:
+    repository: iad.ocir.io/dataservicedev1/k8s-gcr-io/hyperkube
+    tag:  v1.12.1"
+    pullPolicy: IfNotPresent
+
+# Disable external-dns since oci hasn't itegrated into the helm chart.
+# So just create a crappy helm chart that it OCI specific based on:
+#  https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/oracle.md
+## EXTERNAL-DNS
+# https://github.com/helm/charts/tree/master/stable/external-dns
+external-dns:
+  enabled: false
+  image:
+    #  repository: iad.ocir.io/dataservicedev1/registry-opensource-zalan-do/teapot/external-dns
+    #  tag: latest
+    repository: iad.ocir.io/dataservicedev1/bitnami/external-dns
+    tag: v0.5.17-68-gfb05ce48-dirty
+    pullPolicy: IfNotPresent
+
+  #  Manager of the domain on the A record.
+  # In prod will needs to be changed to something unique so dev/QA envs don't accidently override prod
+  # DNS entries.
+  txtOwnerId: automation.peacock@oracle.com
+  #  ociUserFingerprintVaultKey
+  #  ociUserPrivateKeyVaultKey
+  vaultSecretPath: secret/data/app_infra/external_dns
+  # vaultAuthRole: "default"
+  #  These templates could just be strings.
+  ociUserFingerprintVaultTmpl: "{{ .Data.data.OCI_USER_FINGERPRINT  }}"
+  # Base64 encoded pem file in Vault.  If you use a non vault key, then make sure decode and indent
+  # So this MUST be a template value.
+  ociUserPrivateKeyVaultTmpl: "{{ .Data.data.OCI_USER_PRIVATE_KEY | base64Decode | indent 4 }}"
+  ociUserId: ""
+  tenancyId: ""
+  region: ""
+  compartmentId: ""
+  deploymentAnnotations: {}
+
+  sources: ["ingress"]  # service
+  # provider: oci
+  #domainFilters:
+  #  - us-ashburn-1.oci.oc-test.com
+  extraArgs:
+    - oci-config-file: /etc/kubernetes/oci.yaml
+    - oci-domain-mode
+
+
+oci-external-dns:
+  txtOwnerId: "${TXT_OWNER_ID}"
+  vaultSecretPath: "${VAULT_SECRET_PATH}"
+  ociUserFingerprintVaultTmpl: "{{ .Data.data.${APP_INFRA_DNS_USER_FINGERPRINT_KEY}  }}"
+  # Base64 encoded pem file in Vault.
+  ociUserPrivateKeyVaultTmpl: "{{ .Data.data.${APP_INFRA_DNS_USER_PRIVATE_KEY_KEY} | base64Decode | indent 6 }}"
+  ociUserId: "${APP_INFRA_DNS_USER_ID}"
+  tenancyId: "${TENANCY_ID}"
+  region: "${REGION}"
+  compartmentId: "${COMPARTMENT_ID}"
+
+  extraLabels:
+    common-logging-flow: enabled
+
+
+auth:
+  region: us-phoenix-1
+  tenancy: ocid1.tenancy.oc1...
+  user: ocid1.user.oc1...
+  key: |
+    -----BEGIN RSA PRIVATE KEY-----
+    -----END RSA PRIVATE KEY-----
+  fingerprint: af:81:71:8e...
+compartment: ocid1.compartment.oc1...
+
+vault:
+  enabled: false
+  url:
+  ca:
+  service_account: cert-manager-acct
+  vault_auth_role: cert-manager

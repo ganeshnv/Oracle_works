@@ -1,0 +1,17 @@
+helmDefaults:
+  wait: false
+  timeout: 600
+  force: false
+  recreatePods: false
+
+repositories: []
+
+environments:
+  {{ .Environment.Name }}: {}
+
+releases:
+ - name: cwd-coordinator
+   namespace: cwd-apps
+   chart: .
+   values:
+   - ../../environments/{{ .Environment.Name }}/cwd-coordinator.yaml

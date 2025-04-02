@@ -1,0 +1,82 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "oci-external-dns.fullname" $ }}
+  labels:
+    {{- include "oci-external-dns.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels: {{ include "oci-external-dns.matchLabels" . | nindent 6 }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{- include "oci-external-dns.labels" . | nindent 8 }}
+        {{- .Values.extraLabels | toYaml | nindent 8 }}
+      annotations:
+        vault.security.banzaicloud.io/vault-agent-configmap: {{ include "oci-external-dns.fullname" $ }}-oci-yaml
+        vault.security.banzaicloud.io/vault-configfile-path: "/etc/kubernetes"
+        vault.security.banzaicloud.io/vault-role: "{{ .Values.vaultAuthRole }}"
+        vault.security.banzaicloud.io/vault-agent-cpu: "400m"
+        vault.security.banzaicloud.io/vault-agent-memory: "256Mi"
+      {{- with .Values.deploymentAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/oci-auth-configmap.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ .Chart.Name }}
+{{/*      serviceAccountName: {{ include "oci-external-dns.fullname" $ }}*/}}
+      containers:
+        - name: external-dns
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          args:
+{{/*            - --source=service*/}}
+            - --provider=oci
+            - --policy=upsert-only # prevent ExternalDNS from deleting any records, omit to enable full synchronization
+            - --txt-owner-id={{ .Values.txtOwnerId}}
+
+            {{- range .Values.domainFilters }}
+            - --domain-filter={{ . }}
+            {{- end }}
+            {{- range .Values.zoneIdFilters }}
+            - --zone-id-filter={{ . }}
+            {{- end }}
+            {{- range .Values.sources }}
+            - --source={{ . }}
+            {{- end }}
+            {{- if .Values.logLevel }}
+            - --log-level={{ .Values.logLevel }}
+            {{- end }}
+            {{- if .Values.dryRun }}
+            - --dry-run
+            {{- end }}
+            {{- if .Values.publishInternalServices }}
+            - --publish-internal-services
+            {{- end }}
+            # Extra arguments
+            {{- range $key, $value := .Values.extraArgs }}
+              {{- if $value }}
+            - --{{ $key }}={{ $value }}
+              {{- else }}
+            - --{{ $key }}
+              {{- end }}
+            {{- end }}
+          {{- if .Values.metrics.enabled }}
+          ports:
+          - name: http
+            containerPort: {{ .Values.service.port }}
+
+          readinessProbe: {{ toYaml .Values.readinessProbe | nindent 12 }}
+          livenessProbe: {{ toYaml .Values.livenessProbe | nindent 12 }}
+          {{- end }}
+
+{{/*          volumeMounts:*/}}
+{{/*            - name: config*/}}
+{{/*              mountPath: /etc/kubernetes/*/}}
+{{/*      volumes:*/}}
+{{/*        - name: config*/}}
+{{/*          configMap:*/}}
+{{/*            name: {{ include "oci-external-dns.fullname" $ }}-oci-yaml*/}}

@@ -1,0 +1,5 @@
+.idea
+**/*/requirements.lock
+
+# downloaded charts at dependency resolve
+charts/*/charts

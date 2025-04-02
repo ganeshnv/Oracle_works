@@ -1,0 +1,12 @@
+{{- if .Values.ssl.enabled }}
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: {{ .Values.ssl.name }}
+  labels:
+    {{- include "monitoring.labels" . | nindent 4 }}
+data:
+  tls.crt: {{ .Values.ssl.tls_crt | b64enc }}
+  tls.key: {{ .Values.ssl.tls_key | b64enc }}
+{{- end }}

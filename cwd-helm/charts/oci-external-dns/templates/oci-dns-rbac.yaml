@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Chart.Name }}
+#  name: {{ include "oci-external-dns.fullname" $ }}
+  labels:
+    {{- include "oci-external-dns.labels" . | nindent 4 }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "oci-external-dns.fullname" $ }}
+  labels:
+    {{- include "oci-external-dns.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get","watch","list"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get","watch","list"]
+  - apiGroups: ["extensions"]
+    resources: ["ingresses"]
+    verbs: ["get","watch","list"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "oci-external-dns.fullname" $ }}-viewer
+  labels:
+    {{- include "oci-external-dns.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "oci-external-dns.fullname" $ }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Chart.Name }}
+{{/*    name: {{ include "oci-external-dns.fullname" $ }}*/}}
+    namespace: {{ .Release.Namespace }}

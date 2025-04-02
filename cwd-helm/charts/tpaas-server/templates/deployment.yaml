@@ -1,0 +1,271 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "tpaas-server-api-name" . }}
+  labels:
+{{ include "tpaas-server-api.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.components.ui.service.replicas }}
+  selector:
+    matchLabels:
+      {{- include "tpaas-server-api.labels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.deployment.extraAnnotations }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+      labels:
+        {{- include "tpaas-server-api.labels" . | nindent 8 }}
+        {{- with .Values.extraLabels }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+      initContainers:
+      {{- include "initContainers-wallet-file" . | indent 6 }}
+      containers:
+        - name: {{ template "tpaas-server-api-name" . }}
+          image: {{ template "image-url" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+          {{- include "volume-mount-properties-api" . | nindent 10 }}
+          {{- include "volume-mount-db-wallet-unzipped" . | indent 10 }}
+          {{- include "oci-private-key-volume-mount" . | indent 10 }}
+          args:
+          {{- include "container-args" (dict "name" "api") | nindent 10 }}
+          env:
+            - name: TEST_NOTIFICATION_MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MAIL_PWD
+                  name: {{ include "tpaas-server.fullname" . }}-passwords
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: DB_PWD
+                  name: {{ include "tpaas-server.fullname" . }}-passwords
+            - name: SPRING_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_PWD
+                  name: {{ include "tpaas-server.fullname" . }}-passwords
+            - name: SPRING_REDIS_SENTINEL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_PWD
+                  name: {{ include "tpaas-server.fullname" . }}-passwords
+          envFrom:
+          {{- include "liveness-probe"  (dict "api" .Values.components.api.container.port) | indent 10 }}
+      volumes:
+        {{- include "volume-properties-api" . | nindent 6 }}
+        {{- include "volume-db-wallet" . | nindent 6 }}
+        {{- include "volume-db-wallet-unzipped" . | nindent 6 }}
+        {{- include "oci-private-key-file-volume" . | indent 6 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "tpaas-server-ui-name" . }}
+  labels:
+{{ include "tpaas-server-ui.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.components.ui.service.replicas }}
+  selector:
+    matchLabels:
+      {{- include "tpaas-server-ui.labels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.deployment.extraAnnotations }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+      labels:
+        {{- include "tpaas-server-ui.labels" . | nindent 8 }}
+        {{- with .Values.extraLabels }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+      containers:
+        - name: {{ template "tpaas-server-ui-name" . }}
+          image: {{ template "image-url" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+          {{- include "volume-mount-properties-ui" . | nindent 10 }}
+          args:
+          {{- include "container-args" (dict "name" "ui") | nindent 10 }}
+          envFrom:
+          {{- include "liveness-probe"  (dict "api" .Values.components.ui.container.port) | indent 10 }}
+      volumes:
+        {{- include "volume-properties-ui" . | nindent 6 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "tpaas-server-interceptor-name" . }}
+  labels:
+{{ include "tpaas-server-interceptor.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.components.interceptor.service.replicas }}
+  selector:
+    matchLabels:
+      {{- include "tpaas-server-interceptor.labels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.deployment.extraAnnotations }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+      labels:
+        {{- include "tpaas-server-interceptor.labels" . | nindent 8 }}
+        {{- with .Values.extraLabels }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+      containers:
+        - name: {{ template "tpaas-server-interceptor-name" . }}
+          image: {{ template "image-url" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+          {{- include "volume-mount-properties-interceptor" . | nindent 10 }}
+          args:
+          {{- include "container-args" (dict "name" "interceptor") | nindent 10 }}
+          envFrom:
+          {{- include "liveness-probe"  (dict "api" .Values.components.interceptor.container.port) | indent 10 }}
+      volumes:
+        {{- include "volume-properties-interceptor" . | nindent 6 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "tpaas-server-rate-limit-name" . }}
+  labels:
+{{ include "tpaas-server-rate-limit.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.components.rateLimit.service.replicas }}
+  selector:
+    matchLabels:
+      {{- include "tpaas-server-rate-limit.labels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.deployment.extraAnnotations }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+      labels:
+        {{- include "tpaas-server-rate-limit.labels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+      containers:
+        - name: {{ template "tpaas-server-rate-limit-name" . }}
+          image: {{ template "image-url" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+          {{- include "volume-mount-properties-rate-limit" . | nindent 10 }}
+          args:
+          {{- include "container-args" (dict "name" "ratelimit") | nindent 10 }}
+          envFrom:
+          {{- include "liveness-probe"  (dict "api" .Values.components.rateLimit.container.port) | indent 10 }}
+      volumes:
+        {{- include "volume-properties-rate-limit" . | nindent 6 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "tpaas-server-report-server-name" . }}
+  labels:
+{{ include "tpaas-server-report-server.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.components.reportServer.service.replicas }}
+  selector:
+    matchLabels:
+      {{- include "tpaas-server-report-server.labels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.deployment.extraAnnotations }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+      labels:
+        {{- include "tpaas-server-report-server.labels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+      containers:
+        - name: {{ template "tpaas-server-report-server-name" . }}
+          image: {{ template "reportServer-image-url" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+          {{- include "liveness-probe"  (dict "api" .Values.components.reportServer.container.port) | indent 10 }}
+          env:
+            - name: REPORT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: REPORT_SECRET
+                  name: {{ include "tpaas-server.fullname" . }}-passwords
+          args:
+            {{- include "container-args-report" (dict "id" .Values.components.reportServer.id "endpoint" .Values.components.reportServer.endpoint "region" .Values.components.reportServer.region "bucket" .Values.components.reportServer.bucket) | nindent 10 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "tpaas-server-webshell-name" . }}
+  labels:
+{{ include "tpaas-server-webshell.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.components.webshell.service.replicas }}
+  selector:
+    matchLabels:
+      {{- include "tpaas-server-webshell.labels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.deployment.extraAnnotations }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+      labels:
+        {{- include "tpaas-server-webshell.labels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+      containers:
+        - name: {{ template "tpaas-server-webshell-name" . }}
+          image: {{ template "webshell-image-url" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            {{- include "volume-mount-properties-webshell" . | nindent 10 }}
+          envFrom:
+          {{- include "liveness-probe"  (dict "api" .Values.components.webshell.container.port) | indent 10 }}
+      volumes:
+        {{- include "volume-properties-webshell" . | nindent 6 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "tpaas-server-gitbook-name" . }}
+  labels:
+{{ include "tpaas-server-gitbook.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.components.gitbook.service.replicas }}
+  selector:
+    matchLabels:
+      {{- include "tpaas-server-gitbook.labels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.deployment.extraAnnotations }}{{- toYaml . | trim | nindent 8 }}{{- end }}
+      labels:
+        {{- include "tpaas-server-gitbook.labels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+      containers:
+        - name: {{ template "tpaas-server-gitbook-name" . }}
+          image: {{ template "gitbook-image-url" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            {{- include "container-args" (dict "name" "serve" "extra" "--monitor") | nindent 10 }}
+          envFrom:
+          {{- include "liveness-probe"  (dict "api" .Values.components.gitbook.container.port) | indent 10 }}

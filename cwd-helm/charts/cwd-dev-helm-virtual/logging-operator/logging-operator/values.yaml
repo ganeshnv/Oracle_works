@@ -1,0 +1,26 @@
+affinity: {}
+annotations: {}
+createCustomResource: true
+fullnameOverride: ""
+http:
+  port: 8080
+  service:
+    annotations: {}
+    labels: {}
+    type: ClusterIP
+image:
+  pullPolicy: IfNotPresent
+  repository: banzaicloud/logging-operator
+  tag: 3.0.0-rc.1
+imagePullSecrets: []
+nameOverride: ""
+nodeSelector: {}
+podSecurityContext: {}
+rbac:
+  enabled: true
+  psp:
+    enabled: false
+replicaCount: 1
+resources: {}
+securityContext: {}
+tolerations: []

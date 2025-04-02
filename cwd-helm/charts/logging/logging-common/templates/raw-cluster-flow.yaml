@@ -1,0 +1,43 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: ClusterFlow
+metadata:
+  name: {{ include "logging-common.name" . }}-raw
+  labels:
+{{ include "logging-common.labels" . | indent 4 }}
+spec:
+  filters:
+    # https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions
+    # https://github.com/banzaicloud/logging-operator/blob/master/docs/plugins/filters/detect_exceptions.md
+    - detectExceptions:
+        multiline_flush_interval: "0.1"
+        languages:
+          - java
+          - python
+    # https://github.com/fluent-plugins-nursery/fluent-plugin-concat
+    # https://github.com/banzaicloud/logging-operator/blob/master/docs/plugins/filters/concat.md
+    - concat:
+        multiline_start_regexp: /^--START MULTILINE--/
+        multiline_end_regexp: /^--END MULTILINE--/
+    # https://github.com/banzaicloud/logging-operator/blob/master/docs/plugins/filters/parser.md#Parse-Section
+#  When put this section in, in lumberjack:
+#   1.  message field ends up in #message
+#   2.  none of the k8s metadata/contextual information is loaded.
+#  Not sure if it is a lumberjack output issue dealing with the parsed format or something else
+#  with how the parser is configured?
+#  Would be good to learn why later
+#    - parser:
+#        remove_key_name_field: true
+#        parse:
+#          type: multi_format
+#          patterns:
+#            # TBD: Should we parse nginx log from ingress too? https://docs.fluentd.org/parser/nginx
+#            # https://docs.fluentd.org/parser/json
+#            - format: json
+#              # See https://www.regextester.com/95560 (added anchors to start ^ and end $)
+#              # expression: /^\{.*\:\{.*\:.*\}\}$/
+#            # https://docs.fluentd.org/parser/none
+#            - format: none
+  outputRefs:
+    - {{ include "logging-common.name" . }}-lumberjack
+  selectors:
+    common-logging-flow: enabled

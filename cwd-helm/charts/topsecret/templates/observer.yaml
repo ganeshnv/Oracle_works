@@ -1,0 +1,3 @@
+{{- if .Values.observer.enabled }}
+{{ include "observer.grafana-dashboards" . }}
+{{- end }}

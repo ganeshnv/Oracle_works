@@ -1,0 +1,24 @@
+{{- if .Values.vaultAgent.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-agent-config
+  labels:
+    {{- include "monitoring.labels" . | nindent 4 }}
+data:
+  vault-agent-config.hcl: |
+    auto_auth {
+      method "kubernetes" {
+        mount_path = "auth/kubernetes"
+        config = {
+          role = "prometheus-operator"
+        }
+      }
+      sink "file" {
+        config = {
+          path = "/home/vault/config-out/.topsecret-vault-token"
+        }
+      }
+    }
+{{- end }}

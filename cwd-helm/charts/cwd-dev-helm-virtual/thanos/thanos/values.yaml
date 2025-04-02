@@ -1,0 +1,348 @@
+bucket:
+  affinity: {}
+  annotations: {}
+  deploymentAnnotations: {}
+  deploymentLabels: {}
+  deploymentMatchLabels: {}
+  enabled: true
+  extraArgs: null
+  extraEnv: null
+  http:
+    ingress:
+      annotations: {}
+      enabled: false
+      hosts:
+      - /
+      labels: {}
+      path: /
+      tls: []
+    port: 8080
+    service:
+      annotations: {}
+      labels: {}
+      matchLabels: {}
+      type: ClusterIP
+  label: ""
+  labels: {}
+  logFormat: logfmt
+  logLevel: info
+  nodeSelector: {}
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+  refresh: 30m
+  replicaCount: 1
+  resources: {}
+  securityContext: {}
+  serviceAccount: ""
+  strategy: {}
+  timeout: 5m
+  tolerations: []
+compact:
+  affinity: {}
+  annotations: {}
+  blockSyncConcurrency: 20
+  compactConcurrency: 1
+  consistencyDelay: 30m
+  dataVolume:
+    backend: {}
+  deploymentAnnotations: {}
+  deploymentLabels: {}
+  deploymentMatchLabels: {}
+  enabled: true
+  extraArgs: null
+  extraEnv: null
+  http:
+    port: 10902
+    service:
+      labels: {}
+      matchLabels: {}
+  labels: {}
+  logFormat: logfmt
+  logLevel: info
+  metrics:
+    annotations:
+      enabled: false
+    serviceMonitor:
+      enabled: false
+      labels: {}
+  nodeSelector: {}
+  persistentVolumeClaim: {}
+  resources: {}
+  retentionResolution1h: 1y
+  retentionResolution5m: 120d
+  retentionResolutionRaw: 30d
+  securityContext: {}
+  serviceAccount: ""
+  strategy: {}
+  tolerations: []
+image:
+  pullPolicy: IfNotPresent
+  repository: quay.io/thanos/thanos
+  tag: v0.13.0
+objstore: {}
+objstoreFile: ""
+objstoreSecretOverride: ""
+query:
+  affinity: {}
+  annotations: {}
+  autoDownsampling: false
+  autoscaling:
+    enabled: false
+    maxReplicas: 3
+    minReplicas: 2
+    targetCPUUtilizationPercentage: 50
+    targetMemoryUtilizationPercentage: 50
+  certSecretName: ""
+  deploymentAnnotations: {}
+  deploymentLabels: {}
+  deploymentMatchLabels: {}
+  enabled: true
+  extraArgs: []
+  extraEnv: []
+  grpc:
+    ingress:
+      annotations: {}
+      enabled: false
+      hosts:
+      - /
+      labels: {}
+      path: /
+      tls: []
+    port: 10901
+    service:
+      annotations: {}
+      labels: {}
+      matchLabels: {}
+  http:
+    ingress:
+      annotations: {}
+      enabled: false
+      hosts:
+      - /
+      labels: {}
+      path: /
+      tls: []
+    port: 10902
+    service:
+      annotations: {}
+      labels: {}
+      matchLabels: {}
+      type: ClusterIP
+  labels: {}
+  logFormat: logfmt
+  logLevel: info
+  metrics:
+    annotations:
+      enabled: false
+    serviceMonitor:
+      enabled: false
+      labels: {}
+  nodeSelector: {}
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+  replicaCount: 1
+  replicaLabels: []
+  resources: {}
+  ruleDNSDiscovery: false
+  securityContext: {}
+  serviceAccount: ""
+  serviceDiscoveryFileConfigMaps: []
+  serviceDiscoveryFiles: []
+  serviceDiscoveryInterval: 5m
+  sidecarDNSDiscovery: true
+  storeDNSDiscovery: true
+  storeDNSResolver: miekgdns
+  stores: []
+  strategy: {}
+  tolerations: []
+  webExternalPrefix: ""
+  webPrefixHeader: ""
+  webRoutePrefix: ""
+rule:
+  affinity: {}
+  alertLabelDrop: []
+  alertQueryUrl: ""
+  alertmanagers: []
+  alertmanagersSendTimeout: ""
+  annotations: {}
+  autoscaling:
+    enabled: false
+    maxReplicas: 3
+    minReplicas: 2
+    targetCPUUtilizationPercentage: 50
+    targetMemoryUtilizationPercentage: 50
+  certSecretName: ""
+  enabled: false
+  evalInterval: ""
+  extraArgs: []
+  extraEnv: []
+  grpc:
+    ingress:
+      annotations: {}
+      enabled: false
+      hosts:
+      - /
+      labels: {}
+      path: /
+      tls: []
+    port: 10901
+    service:
+      annotations: {}
+      labels: {}
+      matchLabels: {}
+  http:
+    ingress:
+      annotations: {}
+      enabled: false
+      hosts:
+      - /
+      labels: {}
+      path: /
+      tls: []
+    port: 10902
+    service:
+      annotations: {}
+      labels: {}
+      matchLabels: {}
+      type: ClusterIP
+  labels: {}
+  logFormat: logfmt
+  logLevel: info
+  metrics:
+    annotations:
+      enabled: false
+    serviceMonitor:
+      enabled: false
+      labels: {}
+  nodeSelector: {}
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+  queryDNSDiscovery: true
+  replicaCount: 1
+  resendDelay: ""
+  resources: {}
+  ruleFiles:
+    alerting_rules.yaml: {}
+  ruleLabels: {}
+  ruleOverrideName: ""
+  securityContext: {}
+  serviceAccount: ""
+  statefulsetAnnotations: {}
+  statefulsetLabels: {}
+  statefulsetMatchLabels: {}
+  tolerations: []
+  tsdbBlockDuration: ""
+  tsdbRetention: ""
+  updateStrategy: {}
+  webExternalPrefix: ""
+  webPrefixHeader: ""
+  webRoutePrefix: ""
+sidecar:
+  enabled: true
+  grpc:
+    ingress:
+      annotations: {}
+      enabled: false
+      hosts:
+      - /
+      labels: {}
+      path: /
+      tls: []
+    port: 10901
+    service:
+      annotations: {}
+      externalIPs: []
+      labels: {}
+      nodePort: 31901
+      type: ClusterIP
+  http:
+    ingress:
+      annotations: {}
+      enabled: false
+      hosts:
+      - /
+      labels: {}
+      path: /
+      tls: []
+    port: 10902
+    service:
+      annotations: {}
+      labels: {}
+      type: ClusterIP
+  metrics:
+    serviceMonitor:
+      enabled: false
+      labels: {}
+  selector:
+    app: prometheus
+store:
+  affinity: {}
+  annotations: {}
+  blockSyncConcurrency: 20
+  chunkPoolSize: 2GB
+  dataVolume:
+    backend: {}
+  deploymentAnnotations: {}
+  deploymentLabels: {}
+  deploymentMatchLabels: {}
+  enabled: true
+  extraArgs: []
+  extraEnv: []
+  grpc:
+    ingress:
+      annotations: {}
+      enabled: false
+      hosts:
+      - /
+      labels: {}
+      path: /
+      tls: []
+    port: 10901
+    service:
+      annotations: {}
+      labels: {}
+      matchLabels: {}
+  grpcSeriesMaxConcurrency: 20
+  grpcSeriesSampleLimit: 0
+  http:
+    ingress:
+      annotations: {}
+      enabled: false
+      hosts:
+      - /
+      labels: {}
+      path: /
+      tls: []
+    port: 10902
+    service:
+      annotations: {}
+      labels: {}
+      matchLabels: {}
+      type: ClusterIP
+  indexCacheSize: 250MB
+  labels: {}
+  livenessProbe: {}
+  logFormat: logfmt
+  logLevel: info
+  metrics:
+    annotations:
+      enabled: false
+    serviceMonitor:
+      enabled: false
+      labels: {}
+  nodeSelector: {}
+  persistentVolumeClaim: {}
+  readinessProbe: {}
+  replicaCount: 1
+  resources: {}
+  securityContext: {}
+  serviceAccount: ""
+  strategy: {}
+  syncBlockDuration: 3m
+  timePartioning:
+  - max: ""
+    min: ""
+  tolerations: []

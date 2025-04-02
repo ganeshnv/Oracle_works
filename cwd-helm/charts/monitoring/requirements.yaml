@@ -1,0 +1,11 @@
+dependencies:
+  # https://github.com/helm/charts/tree/master/stable/prometheus-operator
+  - name: prometheus-operator
+    version: 7.5.0
+    repository: https://artifactory.oci.oraclecorp.com:443/cwd-dev-helm-virtual
+    condition: prometheus-operator.enabled
+
+  - name: thanos
+    version: 0.3.23
+    repository: https://artifactory.oci.oraclecorp.com:443/cwd-dev-helm-virtual
+    condition: thanos.enabled

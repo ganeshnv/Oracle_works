@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "tpaas-server-api-name" . }}
+  labels:
+{{ include "tpaas-server-api.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.components.api.service.type }}
+  ports:
+    - port: {{ .Values.components.api.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: serevice
+  selector:
+{{ include "tpaas-server-api.labels" . | indent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "tpaas-server-ui-name" . }}
+  labels:
+{{ include "tpaas-server-ui.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.components.ui.service.type }}
+  ports:
+    - port: {{ .Values.components.ui.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: service
+  selector:
+{{ include "tpaas-server-ui.labels" . | indent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "tpaas-server-interceptor-name" . }}
+  labels:
+{{ include "tpaas-server-interceptor.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.components.interceptor.service.type }}
+  ports:
+    - port: {{ .Values.components.interceptor.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: service
+  selector:
+{{ include "tpaas-server-interceptor.labels" . | indent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "tpaas-server-rate-limit-name" . }}
+  labels:
+{{ include "tpaas-server-rate-limit.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.components.rateLimit.service.type }}
+  ports:
+    - port: {{ .Values.components.rateLimit.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: service
+  selector:
+{{ include "tpaas-server-rate-limit.labels" . | indent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "tpaas-server-report-server-name" . }}
+  labels:
+{{ include "tpaas-server-report-server.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.components.reportServer.service.type }}
+  ports:
+    - port: {{ .Values.components.reportServer.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: service
+  selector:
+{{ include "tpaas-server-report-server.labels" . | indent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "tpaas-server-webshell-name" . }}
+  labels:
+{{ include "tpaas-server-webshell.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.components.webshell.service.type }}
+  ports:
+    - port: {{ .Values.components.webshell.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: service
+  selector:
+{{ include "tpaas-server-webshell.labels" . | indent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "tpaas-server-gitbook-name" . }}
+  labels:
+{{ include "tpaas-server-gitbook.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.components.gitbook.service.type }}
+  ports:
+    - port: {{ .Values.components.gitbook.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: service
+  selector:
+{{ include "tpaas-server-gitbook.labels" . | indent 4 }}

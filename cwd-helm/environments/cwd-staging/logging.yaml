@@ -1,0 +1,9 @@
+lumberjack:
+  compartment: "ocid1.compartment.oc1..aaaaaaaafjtjh5cdfnl5f35cpvtkm6pfwtvqvyjzdnfj2w5zb42atqpnxncq"
+  namespace: "cwd-staging"
+
+logging-common-base:
+  fluentbit:
+    resources:
+      limits:
+        cpu: 1000m

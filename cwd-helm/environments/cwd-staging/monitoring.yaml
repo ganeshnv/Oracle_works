@@ -1,0 +1,159 @@
+vaultAgent:
+  enabled: true
+
+thanos:
+  enabled: false
+
+prometheus-operator:
+  prometheus:
+    prometheusSpec:
+      scrapeInterval: "15s"
+      thanos: null
+      # set the configmap and containers to empty to disable the vault agent first, after vault deployed, turn it on back.
+#      configMaps: [ ]
+#      containers: [ ]
+
+    ingress:
+      enabled: true
+      hosts: ["prometheus.ocws.us-ashburn-1.oci.oc-test.com"]
+      paths: ["/"]
+      tls:
+        - hosts:
+            - "prometheus.ocws.us-ashburn-1.oci.oc-test.com"
+          secretName: monitoring-cert-key
+
+  alertmanager:
+    ingress:
+      enabled: true
+      hosts: ["alertmanager.ocws.us-ashburn-1.oci.oc-test.com"]
+      paths: ["/"]
+      tls:
+        - hosts:
+            - "alertmanager.ocws.us-ashburn-1.oci.oc-test.com"
+          secretName: monitoring-cert-key
+
+    config:
+      global:
+        slack_api_url: null
+      route:
+        receiver: 'null'
+        routes:
+          - receiver: 'null'
+            match:
+              alertname: Watchdog
+#    config:
+#      global:
+#        slack_api_url: ""
+#      route:
+#        group_by: ['job']
+#        group_wait: 30s
+#        group_interval: 5m
+#        repeat_interval: 12h
+#        receiver: slack_alerts_testing
+#        routes:
+#          - receiver: slack_alerts_critical
+#            match_re:
+#              severity: error.*|critical.*
+#          - receiver: slack_alerts_testing
+#            match_re:
+#              severity: info.*|warn.*
+#          - receiver: 'null'
+#            match:
+#              alertname: Watchdog
+
+  grafana:
+    adminPassword: vault:secret/data/cwd-staging/apps/cloudwatchdog/grafana#GRAFANA_ADMIN_PASSWORD
+    ingress:
+      enabled: true
+      hosts: ["grafana.ocws.us-ashburn-1.oci.oc-test.com"]
+      path: "/"
+      tls:
+        - hosts:
+            - "grafana.ocws.us-ashburn-1.oci.oc-test.com"
+          secretName: monitoring-cert-key
+    additionalDataSources:
+      - name: oci
+        type: oci-datasource
+        jsonData:
+          defaultRegion: us-ashburn-1
+          tenancyOCID: ocid1.tenancy.oc1..aaaaaaaalnpy5chkaviwo4ihaseob4riwvamwvvefhm4bxkmu5g5uu43bepq
+          environment: "OCI Instance"
+
+ssl:
+  enabled: true
+  name: monitoring-cert-key
+# use indent to keep the indentation of 4 spaces: https://www.terraform.io/docs/configuration/functions/indent.html
+  tls_crt: |-
+    -----BEGIN CERTIFICATE-----
+    MIIHvjCCBqagAwIBAgIQDEQj9fTMSIq2OughcqMWsDANBgkqhkiG9w0BAQsFADBP
+    MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMSkwJwYDVQQDEyBE
+    aWdpQ2VydCBUTFMgUlNBIFNIQTI1NiAyMDIwIENBMTAeFw0yMzA3MjEwMDAwMDBa
+    Fw0yNDA3MjMyMzU5NTlaMIGCMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZv
+    cm5pYTEVMBMGA1UEBxMMUmVkd29vZCBDaXR5MRswGQYDVQQKExJPcmFjbGUgQ29y
+    cG9yYXRpb24xKjAoBgNVBAMTIW9jd3MudXMtYXNoYnVybi0xLm9jaS5vYy10ZXN0
+    LmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANSv0RHDfAeOdVZc
+    swqIGEGXEnlw72T17o+SqYYwG9Pav/BKHrFrAA+hNzkJCm59kWli9QOIiZb+i91h
+    hzkv1t3OdoO0ngIgu8xmIl0tLYI5kCNYPMR0nQvKnB0E7Wf2Y0+IHjqaX+XvyjJy
+    VctbF9XinPl4F/ULPJoaXHZDH2bF3bBcfrf+o8N6wd2QZoist7Pd0uy6EVh07//3
+    AeVvLX5NewaxcqS0kwJ0RuCPRI99MxXkQVSLQTpVeFqU+8HDGyFzOn9NpyMyZyJ2
+    JBetW9Tb2XehId2dGFYOHJ4oxHOw2GMvq2miUq8AoyzoVg2qe5cR42aaVd1ssOYU
+    YWABIWMCAwEAAaOCBGAwggRcMB8GA1UdIwQYMBaAFLdrouqoqoSMeeq02g+YssWV
+    drn0MB0GA1UdDgQWBBTh844y88fzbUfucpK9kiI5rpwbvjCCAQsGA1UdEQSCAQIw
+    gf+CIW9jd3MudXMtYXNoYnVybi0xLm9jaS5vYy10ZXN0LmNvbYIndHBhYXMub2N3
+    cy51cy1hc2hidXJuLTEub2NpLm9jLXRlc3QuY29tgihwb3J0YWwub2N3cy51cy1h
+    c2hidXJuLTEub2NpLm9jLXRlc3QuY29tgixwcm9tZXRoZXVzLm9jd3MudXMtYXNo
+    YnVybi0xLm9jaS5vYy10ZXN0LmNvbYIpZ3JhZmFuYS5vY3dzLnVzLWFzaGJ1cm4t
+    MS5vY2kub2MtdGVzdC5jb22CLmFsZXJ0bWFuYWdlci5vY3dzLnVzLWFzaGJ1cm4t
+    MS5vY2kub2MtdGVzdC5jb20wDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsG
+    AQUFBwMBBggrBgEFBQcDAjCBjwYDVR0fBIGHMIGEMECgPqA8hjpodHRwOi8vY3Js
+    My5kaWdpY2VydC5jb20vRGlnaUNlcnRUTFNSU0FTSEEyNTYyMDIwQ0ExLTQuY3Js
+    MECgPqA8hjpodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vRGlnaUNlcnRUTFNSU0FT
+    SEEyNTYyMDIwQ0ExLTQuY3JsMD4GA1UdIAQ3MDUwMwYGZ4EMAQICMCkwJwYIKwYB
+    BQUHAgEWG2h0dHA6Ly93d3cuZGlnaWNlcnQuY29tL0NQUzB/BggrBgEFBQcBAQRz
+    MHEwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBJBggrBgEF
+    BQcwAoY9aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0VExTUlNB
+    U0hBMjU2MjAyMENBMS0xLmNydDAJBgNVHRMEAjAAMIIBfAYKKwYBBAHWeQIEAgSC
+    AWwEggFoAWYAdQB2/4g/Crb7lVHCYcz1h7o0tKTNuyncaEIKn+ZnTFo6dAAAAYl5
+    qqDSAAAEAwBGMEQCIEbeQW0kzeGgXK12iA6n6Gg2QmNuo14PytzBGX7aCoj2AiBP
+    EMyusX8X4euqxesS+Aop2McAB/OXDyT6zF5R6A3wAQB1AEiw42vapkc0D+VqAvqd
+    MOscUgHLVt0sgdm7v6s52IRzAAABiXmqoJcAAAQDAEYwRAIgIuJZlNyN4G183X6F
+    MO1jBJh2AVOrRfM+sjuarG68AFsCICDT31fovyImfQxCpnpEkS0ZK8vid1exlXMu
+    1TGa8yNRAHYA2ra/az+1tiKfm8K7XGvocJFxbLtRhIU0vaQ9MEjX+6sAAAGJeaqg
+    PgAABAMARzBFAiEAhHImF6pjE43TRrEfg2KuvajCfxnm3vsqnjP7CQsaOToCIHfZ
+    X9DRgykhh5s15t9p5HHcTfLIKZn/rzVFFlQgXjBxMA0GCSqGSIb3DQEBCwUAA4IB
+    AQB+LdWnRcMBXm2bbq8gXWWx6fZIUN/xLTGv++7oFUCl6K7tyo9mkKbUwI82Unjp
+    a+SB0byVnUYZ82cvELjbFZPSiWWkEBWWEnMmXU6uZfAVxa02Ks0a3KkZtaH+rbj7
+    iwwY6hAt4MlTJ93a31eo1OXkGWvumGDToGafy0/jZogP288ejPODJyGX9IS1aXZm
+    TDs9cBRNST7x5Qpl4bRS6CoCmxvj2PoLxmRbHwtZlNh9pii65Cg1X8zukO49SL5A
+    bL+YovD8wK9GKL4QrntimC300qBegqtZW9BUEJ3BekcTc6hXR00pv8Iq46aAN6ZW
+    GXIEgIyyKHCZ9PCv7yhQuEyg
+    -----END CERTIFICATE-----
+
+  tls_key: |-
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEpAIBAAKCAQEA1K/REcN8B451VlyzCogYQZcSeXDvZPXuj5KphjAb09q/8Eoe
+    sWsAD6E3OQkKbn2RaWL1A4iJlv6L3WGHOS/W3c52g7SeAiC7zGYiXS0tgjmQI1g8
+    xHSdC8qcHQTtZ/ZjT4geOppf5e/KMnJVy1sX1eKc+XgX9Qs8mhpcdkMfZsXdsFx+
+    t/6jw3rB3ZBmiKy3s93S7LoRWHTv//cB5W8tfk17BrFypLSTAnRG4I9Ej30zFeRB
+    VItBOlV4WpT7wcMbIXM6f02nIzJnInYkF61b1NvZd6Eh3Z0YVg4cnijEc7DYYy+r
+    aaJSrwCjLOhWDap7lxHjZppV3Wyw5hRhYAEhYwIDAQABAoIBAEaPJX8NKWKgYlEK
+    Y+OEjveDlP9w9hq6dDBxaYg5AaJhGfgvvssBQn3s8BMd6rYJNmqOB9bqPys2u1Pw
+    fRn9wvzG+A5tp1XxYhxHbfMXf9eKHUV8inxqa4dz6iK+dbxdw0ipUc4DVPlFegEO
+    aWQTjm7IxWcF7ny/A5XkVPRvBEXll+ZetULuLc8O66eaui+JGeh0XEzxRGEWqcJE
+    Yo20uZSOwC1P4wqhV8igKS7BfSc6DgjCaPlygrZZmz2kGn0onV6LazIuopwGFEVF
+    b3JoHJ8cIyw/PjVZ+LNFr7JmWxm+hrV0QRAF/zoaAum2oa/emVOkd5icghnPtsp1
+    Sspu35ECgYEA8Knksv6TNsRCH5b7TZa2JU/afpFOjItRUfiqwgz0KSS8K9BqXPaz
+    khIqhydpsEdY3aNSnR3UPC46hvdlkqgTQ9AD3nPrPw8dwVXusbp1Q+WMYpht4Xkt
+    8a24/ZMl/RITCM+wjtAFjJ5KNMygJT1+khU/CLBdvUEhnE5ut1MZkfUCgYEA4j2E
+    omBvWYfwAC65Dx9HlinqK6AwFt70D+Zl+opIfU4widMQwNOzf9gOkqPNuClxiSa8
+    euMZT5fLI/q03E9plqmp1aHRE7fzBDDHugx/q4ZeG8G2S7Zb0Rb79CjSuK+FRH8j
+    kjMvkBEHGQO9fqjvitBuqauda7j6Xw1L4ZT5VvcCgYEAtwwRtg8pe5Nk09ArjkUe
+    f1ywTGpK+10P2jAv+O6PWyfks9KOw+ykgmqszCWvHnP15IZP1M8WWTu0KmnLaPPL
+    y11RRAaZHFpsAFxS8/1lKeJTl75mfQOFbXf752rfjxALSD1oBge04NKYkHY/LHQM
+    bCIa0ooKkmMSpGeHkIp1PW0CgYBdgAkpxmseeFTS7nxi6I2AXPA/eWOGgDwjuheZ
+    VL8iskbTHxzEZHnBszxKlFH384DNqumoa+TRBS3aP8mxZ0x/DL144fhzislviO1y
+    UaoN7GlGVWeOoN4Pas1UGe8Ejt2n8ld0G51jj/X7+5S8HPtqxjuF+bwEgh1PXUJo
+    B1aI/wKBgQCdEee8mXjpmQtYhsXA2lxGVitE0mWHn4zaIwjCOIuFKokF7DyDHvWe
+    ldEacW77hrK7M5mBERvcCvpj3BonHDSiyarBNx0AyG4jpxeFnxTSZ8lgRlCEnD/m
+    8JWJbPiGlIRrS5YaJxZu/LC+chIIsXC7mdTo7JV+1/JvIxXdWMrDGw==
+    -----END RSA PRIVATE KEY-----

@@ -1,0 +1,306 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "oauth2-proxy-tpaas-ui-name" . }}
+  labels:
+    {{- include "oauth2-proxy-tpaas-ui.labels" . | nindent 4 }}
+  annotations:
+{{ toYaml .Values.ingress.annotations.path | indent 4 }}
+spec:
+  ingressClassName: nginx
+  {{- if .Values.ingress.tls }}
+  tls:
+    {{- range .Values.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.portal.hostname }}
+      http:
+        paths:
+          - path: /(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "oauth2-proxy-tpaas-ui-name" . }}
+                port:
+                  number: {{ .Values.portal.service.port }}
+
+{{- end }}
+---
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "oauth2-proxy-tpaas-api-name" . }}
+  labels:
+    {{- include "oauth2-proxy-tpaas-api.labels" . | nindent 4 }}
+  annotations:
+{{ toYaml .Values.ingress.annotations.path | indent 4 }}
+spec:
+  ingressClassName: nginx
+  {{- if .Values.ingress.tls }}
+  tls:
+  {{- range .Values.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.portal.hostname }}
+      http:
+        paths:
+          - path: /api/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "oauth2-proxy-tpaas-api-name" . }}
+                port:
+                  number: {{ .Values.api.service.port }}
+  {{- end }}
+---
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "oauth2-proxy-tpaas-api-name" . }}-report
+  labels:
+    {{- include "oauth2-proxy-tpaas-api.labels" . | nindent 4 }}
+  annotations:
+{{ toYaml .Values.ingress.annotations.reportServer.path | indent 4 }}
+spec:
+  ingressClassName: nginx
+  {{- if .Values.ingress.tls }}
+  tls:
+  {{- range .Values.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+          - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+  {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.portal.hostname }}
+      http:
+        paths:
+          - path: /(v1/tests)/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "oauth2-proxy-tpaas-api-name" . }}
+                port:
+                  number: {{ .Values.api.service.port }}
+  {{- end }}
+---
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "oauth2-proxy-cwd-name" . }}
+  labels:
+    {{- include "oauth2-proxy-cwd.labels" . | nindent 4 }}
+  annotations:
+{{ toYaml .Values.ingress.annotations.path | indent 4 }}
+spec:
+  ingressClassName: nginx
+  {{- if .Values.ingress.tls }}
+  tls:
+    {{- range .Values.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.cwd.hostname }}
+      http:
+        paths:
+          - path: /(.+)
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "oauth2-proxy-cwd-name" . }}
+                port:
+                  number: {{ .Values.cwd.service.port }}
+  {{- end }}
+---
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "oauth2-proxy-tpaas-report-server-name" . }}
+  labels:
+    {{ include "oauth2-proxy-tpaas-report-server.labels" . | nindent 4 }}
+  annotations:
+{{ toYaml .Values.ingress.annotations.reportServer.path | indent 4 }}
+spec:
+  ingressClassName: nginx
+  {{- if .Values.ingress.tls }}
+  tls:
+    {{- range .Values.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+          - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.reportServer.hostname }}
+      http:
+        paths:
+          - path: /(reportServer|static)/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "oauth2-proxy-tpaas-report-server-name" . }}
+                port:
+                  number: {{ .Values.reportServer.service.port }}
+  {{- end }}
+---
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "oauth2-proxy-tpaas-webshell-name" . }}
+  labels:
+    {{ include "oauth2-proxy-tpaas-webshell.labels" . | nindent 4 }}
+  annotations:
+{{ toYaml .Values.ingress.annotations.webshell.path | indent 4 }}
+spec:
+  ingressClassName: nginx
+  {{- if .Values.ingress.tls }}
+  tls:
+    {{- range .Values.ingress.tls }}
+    - hosts:
+      {{- range .hosts }}
+        - {{ . | quote }}
+      {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.webshell.hostname }}
+      http:
+        paths:
+          - path: /(terminal|logs|webshell\/|ws\/|exec)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "oauth2-proxy-tpaas-webshell-name" . }}
+                port:
+                  number: {{ .Values.webshell.service.port }}
+  {{- end }}
+---
+  {{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "oauth2-proxy-cwd-name" . }}-root
+  labels:
+    {{- include "oauth2-proxy-cwd.labels" . | nindent 4 }}
+  annotations:
+{{ toYaml .Values.ingress.annotations.cwd.rootPath | indent 4 }}
+spec:
+  ingressClassName: nginx
+  {{- if .Values.ingress.tls }}
+  tls:
+    {{- range .Values.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.cwd.hostname }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "oauth2-proxy-cwd-name" . }}
+                port:
+                  number: {{ .Values.cwd.service.port }}
+  {{- end }}
+---
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "oauth2-proxy-cwd-internal-name" . }}
+  labels:
+    {{- include "oauth2-proxy-cwd-internal.labels" . | nindent 4 }}
+  annotations:
+{{ toYaml .Values.ingress.annotations.cwd.internalPath | indent 4 }}
+spec:
+  ingressClassName: nginx
+  {{- if .Values.ingress.tlsInternal }}
+  tls:
+    {{- range .Values.ingress.tlsInternal }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.cwd.internal.hostname }}
+      http:
+        paths:
+          - path: /(.+)
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "oauth2-proxy-cwd-internal-name" . }}
+                port:
+                  number: {{ .Values.cwd.service.port }}
+  {{- end }}
+---
+  {{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "oauth2-proxy-cwd-internal-name" . }}-root
+  labels:
+    {{- include "oauth2-proxy-cwd-internal.labels" . | nindent 4 }}
+  annotations:
+{{ toYaml .Values.ingress.annotations.cwd.internalRootPath | indent 4 }}
+spec:
+  ingressClassName: nginx
+  {{- if .Values.ingress.tlsInternal }}
+  tls:
+    {{- range .Values.ingress.tlsInternal }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.cwd.internal.hostname }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "oauth2-proxy-cwd-internal-name" . }}
+                port:
+                  number: {{ .Values.cwd.service.port }}
+  {{- end }}

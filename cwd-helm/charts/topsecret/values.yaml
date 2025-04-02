@@ -1,0 +1,97 @@
+global:
+  imagePullSecrets:
+    - name: ocirsecret
+
+  oci:
+    tenancyOcid: ""
+    region: ""
+    administratorGroupOcid: ""
+    objectStoreNamespace: ""
+    user:
+      ocid: ""
+      fingerprint: ""
+      apiKey: ""
+
+observer:
+  enabled: true
+
+## VAULT-OPERATOR
+# https://github.com/banzaicloud/bank-vaults/tree/master/charts/vault-operator
+vault-operator:
+  enabled: true
+
+  replicaCount: 1
+  # https://helm.sh/docs/developing_charts/#automatically-delete-hook-from-previous-release
+  crdAnnotations:
+    "helm.sh/hook": "crd-install"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+
+  image:
+    repository: iad.ocir.io/dataservicedev1/banzaicloud/vault-operator
+    tag: 0.8.1
+
+  etcd-operator:
+    enabled: false
+
+vault-secrets-webhook:
+  enabled: true
+  image:
+    repository: iad.ocir.io/dataservicedev1/banzaicloud/vault-secrets-webhook
+    tag: 0.8.1
+    pullPolicy: IfNotPresent
+  env:
+    VAULT_IMAGE: "iad.ocir.io/dataservicedev1/hashicorp/vault:1.3.7"
+    VAULT_ENV_IMAGE: "iad.ocir.io/dataservicedev1/banzaicloud/vault-env:0.8.1"
+    VAULT_CT_IMAGE: "iad.ocir.io/dataservicedev1/hashicorp/consul-template:0.24.1-alpine"
+    # https://github.com/banzaicloud/bank-vaults/blob/master/docs/mutating-webhook/consul-template.md#defaults-via-environment-variables
+    # This would be nice to templatize but meh.
+    VAULT_ADDR: "https://topsecret-vault.system-secret:8200"
+    VAULT_SKIP_VERIFY: "true"
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  volumes: []
+  # - name: vault-tls
+  #   secret:
+  #     secretName: vault-tls
+  volumeMounts: []
+  # - name: vault-tls
+  #   mountPath: /vault/tls
+
+vault-k8s:
+  enabled: true
+  injector:
+    enabled: true
+    externalVaultAddr: "https://topsecret-vault.system-secret:8200"
+    image:
+      repository: iad.ocir.io/cwdinfradev/hashicorp/vault-k8s 
+      tag: 0.11.0
+      pullPolicy: IfNotPresent
+
+    agentImage:
+      repository: iad.ocir.io/dataservicedev1/hashicorp/vault
+      tag: 1.3.7
+
+
+vault:
+  name: "vault"
+  size: 3
+  image:
+    repository: iad.ocir.io/dataservicedev1/library/vault
+    tag: 1.2.3
+
+  bankVaults:
+    image:
+      repository: iad.ocir.io/cwdinfradev/banzaicloud/bank-vaults
+      tag: 1.13.1
+
+  port: 8200
+
+  oci:
+    tenancyOcid: ""
+    region: ""
+    user:
+      ocid: ""
+      fingerprint: ""
+
